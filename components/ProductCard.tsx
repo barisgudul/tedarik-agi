@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../constants/colors';
-import { spacing, typography, borderRadius, shadows } from '../constants/styles';
+import { spacing, typography, borderRadius, shadows, commonStyles } from '../constants/styles';
 
 interface ProductCardProps {
   id: string;
@@ -23,7 +23,7 @@ interface ProductCardProps {
   onPress: () => void;
   onFavoritePress?: () => void;
   onContactPress?: () => void;
-  variant?: 'default' | 'compact' | 'featured';
+  variant?: 'default' | 'compact' | 'featured' | 'premium';
 }
 
 export default function ProductCard({
@@ -51,7 +51,9 @@ export default function ProductCard({
       case 'compact':
         return (
           <TouchableOpacity style={styles.compactCard} onPress={onPress}>
-            <Text style={styles.compactImage}>{image}</Text>
+            <View style={styles.compactImageContainer}>
+              <Text style={styles.compactImage}>{image}</Text>
+            </View>
             <View style={styles.compactContent}>
               <Text style={styles.compactName} numberOfLines={1}>{name}</Text>
               <Text style={styles.compactPrice}>{price}</Text>
@@ -68,7 +70,9 @@ export default function ProductCard({
                 <Text style={styles.discountText}>%{discountPercentage}</Text>
               </View>
             )}
-            <Text style={styles.featuredImage}>{image}</Text>
+            <View style={styles.featuredImageContainer}>
+              <Text style={styles.featuredImage}>{image}</Text>
+            </View>
             <View style={styles.featuredContent}>
               <Text style={styles.featuredName} numberOfLines={2}>{name}</Text>
               <View style={styles.featuredPriceContainer}>
@@ -83,9 +87,64 @@ export default function ProductCard({
               </View>
               {rating > 0 && (
                 <View style={styles.ratingContainer}>
-                  <Ionicons name="star" size={14} color={colors.gold.primary} />
+                  <Ionicons name="star" size={14} color={colors.primary} />
                   <Text style={styles.ratingText}>{rating}</Text>
                 </View>
+              )}
+            </View>
+          </TouchableOpacity>
+        );
+
+      case 'premium':
+        return (
+          <TouchableOpacity style={styles.premiumCard} onPress={onPress}>
+            {hasDiscount && (
+              <View style={styles.premiumDiscountBadge}>
+                <Text style={styles.premiumDiscountText}>%{discountPercentage}</Text>
+              </View>
+            )}
+            <View style={styles.premiumImageContainer}>
+              <Text style={styles.premiumImage}>{image}</Text>
+              {onFavoritePress && (
+                <TouchableOpacity style={styles.premiumFavoriteButton} onPress={onFavoritePress}>
+                  <Ionicons 
+                    name={isFavorite ? "heart" : "heart-outline"} 
+                    size={24} 
+                    color={isFavorite ? colors.error : colors.text.inverse} 
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
+            <View style={styles.premiumContent}>
+              <View style={styles.premiumHeader}>
+                <Text style={styles.premiumName} numberOfLines={2}>{name}</Text>
+                <View style={styles.premiumPriceContainer}>
+                  <Text style={styles.premiumPrice}>{price}</Text>
+                  {hasDiscount && (
+                    <Text style={styles.premiumOriginalPrice}>{originalPrice}</Text>
+                  )}
+                </View>
+              </View>
+              <View style={styles.premiumMeta}>
+                <View style={styles.premiumCategoryContainer}>
+                  <Text style={styles.premiumCategory}>{category}</Text>
+                </View>
+                <View style={styles.premiumLocationContainer}>
+                  <Ionicons name="location" size={14} color={colors.text.tertiary} />
+                  <Text style={styles.premiumLocation}>{location}</Text>
+                </View>
+              </View>
+              {rating > 0 && (
+                <View style={styles.premiumRatingContainer}>
+                  <Ionicons name="star" size={16} color={colors.primary} />
+                  <Text style={styles.premiumRatingText}>{rating}</Text>
+                </View>
+              )}
+              {onContactPress && (
+                <TouchableOpacity style={styles.premiumContactButton} onPress={onContactPress}>
+                  <Ionicons name="chatbubble-outline" size={16} color={colors.text.inverse} />
+                  <Text style={styles.premiumContactButtonText}>İletişim</Text>
+                </TouchableOpacity>
               )}
             </View>
           </TouchableOpacity>
@@ -99,7 +158,9 @@ export default function ProductCard({
                 <Text style={styles.discountText}>%{discountPercentage}</Text>
               </View>
             )}
-            <Text style={styles.image}>{image}</Text>
+            <View style={styles.imageContainer}>
+              <Text style={styles.image}>{image}</Text>
+            </View>
             <View style={styles.content}>
               <Text style={styles.name} numberOfLines={2}>{name}</Text>
               <View style={styles.priceContainer}>
@@ -112,13 +173,15 @@ export default function ProductCard({
               <Text style={styles.location}>📍 {location}</Text>
               {rating > 0 && (
                 <View style={styles.ratingContainer}>
-                  <Ionicons name="star" size={14} color={colors.gold.primary} />
+                  <Ionicons name="star" size={14} color={colors.primary} />
                   <Text style={styles.ratingText}>{rating}</Text>
                 </View>
               )}
-              <TouchableOpacity style={styles.contactButton} onPress={onContactPress}>
-                <Text style={styles.contactButtonText}>İletişim</Text>
-              </TouchableOpacity>
+              {onContactPress && (
+                <TouchableOpacity style={styles.contactButton} onPress={onContactPress}>
+                  <Text style={styles.contactButtonText}>İletişim</Text>
+                </TouchableOpacity>
+              )}
             </View>
             {onFavoritePress && (
               <TouchableOpacity style={styles.favoriteButton} onPress={onFavoritePress}>
@@ -141,68 +204,81 @@ const styles = StyleSheet.create({
   // Default Card
   card: {
     backgroundColor: colors.background.card,
-    borderRadius: borderRadius.lg,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-    ...shadows.md,
+    borderRadius: borderRadius.xl,
+    padding: spacing.lg,
+    marginBottom: spacing.md,
+    ...shadows.soft,
     position: 'relative',
+    borderWidth: 1,
+    borderColor: colors.border.light,
+  },
+  imageContainer: {
+    borderRadius: borderRadius.lg,
+    overflow: 'hidden',
+    marginBottom: spacing.md,
+    backgroundColor: colors.gray,
   },
   image: {
     fontSize: 60,
     textAlign: 'center',
-    marginBottom: spacing.md,
+    padding: spacing.lg,
   },
   content: {
     flex: 1,
   },
   name: {
-    fontSize: typography.sizes.md,
-    fontWeight: '600' as const,
+    fontSize: typography.sizes.lg,
+    fontWeight: '700' as const,
     color: colors.text.primary,
-    marginBottom: spacing.xs,
+    marginBottom: spacing.sm,
+    lineHeight: typography.lineHeights.tight,
   },
   priceContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: spacing.xs,
+    marginBottom: spacing.sm,
   },
   price: {
-    fontSize: typography.sizes.lg,
-    fontWeight: '700' as const,
-    color: colors.gold.primary,
-    marginRight: spacing.xs,
+    fontSize: typography.sizes.xl,
+    fontWeight: '800' as const,
+    color: colors.primary,
+    marginRight: spacing.sm,
   },
   originalPrice: {
-    fontSize: typography.sizes.sm,
+    fontSize: typography.sizes.md,
     color: colors.text.tertiary,
     textDecorationLine: 'line-through',
+    fontWeight: '500' as const,
   },
   category: {
     fontSize: typography.sizes.sm,
     color: colors.text.secondary,
     marginBottom: spacing.xs,
+    fontWeight: '600' as const,
   },
   location: {
-    fontSize: typography.sizes.xs,
+    fontSize: typography.sizes.sm,
     color: colors.text.tertiary,
-    marginBottom: spacing.sm,
+    marginBottom: spacing.md,
   },
   ratingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: spacing.sm,
+    marginBottom: spacing.md,
   },
   ratingText: {
     fontSize: typography.sizes.sm,
     color: colors.text.secondary,
     marginLeft: spacing.xs,
+    fontWeight: '600' as const,
   },
   contactButton: {
-    backgroundColor: colors.gold.primary,
+    backgroundColor: colors.primary,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
-    borderRadius: borderRadius.md,
+    borderRadius: borderRadius.lg,
     alignItems: 'center',
+    ...shadows.subtle,
   },
   contactButtonText: {
     color: colors.text.inverse,
@@ -211,21 +287,21 @@ const styles = StyleSheet.create({
   },
   favoriteButton: {
     position: 'absolute',
-    top: spacing.sm,
-    right: spacing.sm,
+    top: spacing.md,
+    right: spacing.md,
     backgroundColor: colors.background.card,
     borderRadius: borderRadius.full,
     padding: spacing.xs,
-    ...shadows.sm,
+    ...shadows.subtle,
   },
   discountBadge: {
     position: 'absolute',
-    top: spacing.sm,
-    left: spacing.sm,
+    top: spacing.md,
+    left: spacing.md,
     backgroundColor: colors.error,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
-    borderRadius: borderRadius.sm,
+    borderRadius: borderRadius.lg,
     zIndex: 1,
   },
   discountText: {
@@ -237,34 +313,45 @@ const styles = StyleSheet.create({
   // Compact Card
   compactCard: {
     backgroundColor: colors.background.card,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    ...shadows.subtle,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+  },
+  compactImageContainer: {
+    width: 60,
+    height: 60,
     borderRadius: borderRadius.md,
-    padding: spacing.sm,
-    marginRight: spacing.sm,
-    width: 120,
-    ...shadows.sm,
+    backgroundColor: colors.gray[100],
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.md,
   },
   compactImage: {
-    fontSize: 40,
+    fontSize: 30,
     textAlign: 'center',
-    marginBottom: spacing.sm,
   },
   compactContent: {
     flex: 1,
   },
   compactName: {
-    fontSize: typography.sizes.sm,
+    fontSize: typography.sizes.md,
     fontWeight: '600' as const,
     color: colors.text.primary,
     marginBottom: spacing.xs,
   },
   compactPrice: {
-    fontSize: typography.sizes.md,
+    fontSize: typography.sizes.lg,
     fontWeight: '700' as const,
-    color: colors.gold.primary,
+    color: colors.primary,
     marginBottom: spacing.xs,
   },
   compactCategory: {
-    fontSize: typography.sizes.xs,
+    fontSize: typography.sizes.sm,
     color: colors.text.secondary,
   },
 
@@ -274,49 +361,187 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.xl,
     padding: spacing.lg,
     marginBottom: spacing.md,
-    ...shadows.lg,
-    position: 'relative',
+    ...shadows.medium,
+    borderWidth: 2,
+    borderColor: colors.primary,
+  },
+  featuredImageContainer: {
+    borderRadius: borderRadius.lg,
+    overflow: 'hidden',
+    marginBottom: spacing.lg,
+    backgroundColor: colors.gray[100],
   },
   featuredImage: {
     fontSize: 80,
     textAlign: 'center',
-    marginBottom: spacing.md,
+    padding: spacing.xl,
   },
   featuredContent: {
     flex: 1,
   },
   featuredName: {
-    fontSize: typography.sizes.lg,
-    fontWeight: '700' as const,
+    fontSize: typography.sizes.xl,
+    fontWeight: '800' as const,
     color: colors.text.primary,
     marginBottom: spacing.sm,
+    lineHeight: typography.lineHeights.tight,
   },
   featuredPriceContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: spacing.sm,
+    marginBottom: spacing.md,
   },
   featuredPrice: {
-    fontSize: typography.sizes.xl,
-    fontWeight: '700' as const,
-    color: colors.gold.primary,
-    marginRight: spacing.sm,
+    fontSize: typography.sizes.xxl,
+    fontWeight: '900' as const,
+    color: colors.primary,
+    marginRight: spacing.md,
   },
   featuredOriginalPrice: {
-    fontSize: typography.sizes.md,
+    fontSize: typography.sizes.lg,
     color: colors.text.tertiary,
     textDecorationLine: 'line-through',
+    fontWeight: '500' as const,
   },
   featuredMeta: {
-    marginBottom: spacing.sm,
+    marginBottom: spacing.md,
   },
   featuredCategory: {
     fontSize: typography.sizes.md,
     color: colors.text.secondary,
     marginBottom: spacing.xs,
+    fontWeight: '600' as const,
   },
   featuredLocation: {
     fontSize: typography.sizes.sm,
     color: colors.text.tertiary,
+  },
+
+  // Premium Card
+  premiumCard: {
+    backgroundColor: colors.background.card,
+    borderRadius: borderRadius.xl,
+    overflow: 'hidden',
+    marginBottom: spacing.lg,
+    ...shadows.medium,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+  },
+  premiumImageContainer: {
+    position: 'relative',
+    backgroundColor: colors.gray[100],
+    height: 200,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  premiumImage: {
+    fontSize: 100,
+    textAlign: 'center',
+  },
+  premiumFavoriteButton: {
+    position: 'absolute',
+    top: spacing.md,
+    right: spacing.md,
+    backgroundColor: colors.background.card,
+    borderRadius: borderRadius.full,
+    padding: spacing.sm,
+    ...shadows.subtle,
+  },
+  premiumDiscountBadge: {
+    position: 'absolute',
+    top: spacing.md,
+    left: spacing.md,
+    backgroundColor: colors.error,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.lg,
+    zIndex: 1,
+    ...shadows.subtle,
+  },
+  premiumDiscountText: {
+    color: colors.text.inverse,
+    fontSize: typography.sizes.sm,
+    fontWeight: '800' as const,
+  },
+  premiumContent: {
+    padding: spacing.xl,
+  },
+  premiumHeader: {
+    marginBottom: spacing.lg,
+  },
+  premiumName: {
+    fontSize: typography.sizes.xxl,
+    fontWeight: '900' as const,
+    color: colors.text.primary,
+    marginBottom: spacing.md,
+    lineHeight: typography.lineHeights.tight,
+  },
+  premiumPriceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  premiumPrice: {
+    fontSize: typography.sizes.xxl,
+    fontWeight: '900' as const,
+    color: colors.primary,
+    marginRight: spacing.lg,
+  },
+  premiumOriginalPrice: {
+    fontSize: typography.sizes.xl,
+    color: colors.text.tertiary,
+    textDecorationLine: 'line-through',
+    fontWeight: '500' as const,
+  },
+  premiumMeta: {
+    marginBottom: spacing.lg,
+  },
+  premiumCategoryContainer: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: borderRadius.lg,
+    alignSelf: 'flex-start',
+    marginBottom: spacing.sm,
+  },
+  premiumCategory: {
+    fontSize: typography.sizes.sm,
+    color: colors.text.inverse,
+    fontWeight: '700' as const,
+  },
+  premiumLocationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  premiumLocation: {
+    fontSize: typography.sizes.md,
+    color: colors.text.tertiary,
+    marginLeft: spacing.xs,
+  },
+  premiumRatingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.lg,
+  },
+  premiumRatingText: {
+    fontSize: typography.sizes.md,
+    color: colors.text.secondary,
+    marginLeft: spacing.sm,
+    fontWeight: '600' as const,
+  },
+  premiumContactButton: {
+    backgroundColor: colors.primary,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    borderRadius: borderRadius.lg,
+    ...shadows.subtle,
+  },
+  premiumContactButtonText: {
+    color: colors.text.inverse,
+    fontSize: typography.sizes.md,
+    fontWeight: '700' as const,
+    marginLeft: spacing.sm,
   },
 });

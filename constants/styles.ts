@@ -19,7 +19,6 @@ export const typography = {
     lg: 18,
     xl: 20,
     xxl: 24,
-    xxxl: 28,
     display: 32,
   },
   weights: {
@@ -35,30 +34,35 @@ export const typography = {
     normal: 1.4,
     relaxed: 1.6,
   },
+  letterSpacing: {
+    tight: -0.5,
+    normal: 0,
+    wide: 0.5,
+  },
 };
 
 // Shadows
 export const shadows = {
-  sm: {
-    shadowColor: colors.shadow.light,
+  subtle: {
+    shadowColor: colors.shadow.subtle,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 1,
     shadowRadius: 2,
-    elevation: 2,
+    elevation: 1,
   },
-  md: {
-    shadowColor: colors.shadow.medium,
+  soft: {
+    shadowColor: colors.shadow.soft,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 1,
     shadowRadius: 4,
-    elevation: 4,
+    elevation: 2,
   },
-  lg: {
-    shadowColor: colors.shadow.dark,
+  medium: {
+    shadowColor: colors.shadow.medium,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 1,
     shadowRadius: 8,
-    elevation: 8,
+    elevation: 4,
   },
 };
 
@@ -69,57 +73,65 @@ export const borderRadius = {
   md: 12,
   lg: 16,
   xl: 20,
-  xxl: 25,
   full: 9999,
 };
 
 // Common Styles
 export const commonStyles = {
-  // Container Styles
   container: {
     flex: 1,
     backgroundColor: colors.background.primary,
   },
-  
-  // Card Styles
   card: {
     backgroundColor: colors.background.card,
-    borderRadius: borderRadius.md,
-    padding: spacing.md,
-    ...shadows.sm,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    ...shadows.soft,
+    borderWidth: 1,
+    borderColor: colors.border.light,
   },
-  
-  // Button Styles
   button: {
     primary: {
       backgroundColor: colors.primary,
       paddingVertical: spacing.md,
-      paddingHorizontal: spacing.lg,
-      borderRadius: borderRadius.md,
+      paddingHorizontal: spacing.xl,
+      borderRadius: borderRadius.lg,
       alignItems: 'center' as const,
       justifyContent: 'center' as const,
+      ...shadows.soft,
+      borderWidth: 0,
     },
     secondary: {
       backgroundColor: colors.background.secondary,
       borderWidth: 1,
       borderColor: colors.primary,
       paddingVertical: spacing.md,
-      paddingHorizontal: spacing.lg,
-      borderRadius: borderRadius.md,
+      paddingHorizontal: spacing.xl,
+      borderRadius: borderRadius.lg,
       alignItems: 'center' as const,
       justifyContent: 'center' as const,
+      ...shadows.subtle,
     },
-    gold: {
-      backgroundColor: colors.gold.primary,
+    accent: {
+      backgroundColor: colors.accent,
       paddingVertical: spacing.md,
-      paddingHorizontal: spacing.lg,
-      borderRadius: borderRadius.md,
+      paddingHorizontal: spacing.xl,
+      borderRadius: borderRadius.lg,
       alignItems: 'center' as const,
       justifyContent: 'center' as const,
+      ...shadows.soft,
+      borderWidth: 0,
+    },
+    ghost: {
+      backgroundColor: 'transparent',
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.xl,
+      borderRadius: borderRadius.lg,
+      alignItems: 'center' as const,
+      justifyContent: 'center' as const,
+      borderWidth: 0,
     },
   },
-  
-  // Text Styles
   text: {
     h1: {
       fontSize: typography.sizes.display,
@@ -128,13 +140,13 @@ export const commonStyles = {
       lineHeight: typography.lineHeights.tight,
     },
     h2: {
-      fontSize: typography.sizes.xxxl,
+      fontSize: typography.sizes.xxl,
       fontWeight: typography.weights.bold,
       color: colors.text.primary,
       lineHeight: typography.lineHeights.tight,
     },
     h3: {
-      fontSize: typography.sizes.xxl,
+      fontSize: typography.sizes.xl,
       fontWeight: typography.weights.semibold,
       color: colors.text.primary,
       lineHeight: typography.lineHeights.normal,
@@ -157,16 +169,14 @@ export const commonStyles = {
       color: colors.text.inverse,
     },
   },
-  
-  // Input Styles
   input: {
     container: {
       backgroundColor: colors.background.secondary,
-      borderRadius: borderRadius.md,
-      paddingHorizontal: spacing.md,
-      paddingVertical: spacing.sm,
+      borderRadius: borderRadius.lg,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
       borderWidth: 1,
-      borderColor: colors.gray[300],
+      borderColor: colors.border.light,
     },
     text: {
       fontSize: typography.sizes.md,
@@ -176,59 +186,22 @@ export const commonStyles = {
       color: colors.text.tertiary,
     },
   },
-  
-  // Header Styles
   header: {
     container: {
       backgroundColor: colors.background.secondary,
-      paddingHorizontal: spacing.lg,
-      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.xl,
+      paddingVertical: spacing.lg,
       borderBottomWidth: 1,
-      borderBottomColor: colors.gray[200],
+      borderBottomColor: colors.border.light,
       flexDirection: 'row' as const,
       justifyContent: 'space-between' as const,
       alignItems: 'center' as const,
+      ...shadows.subtle,
     },
     title: {
       fontSize: typography.sizes.xl,
       fontWeight: typography.weights.bold,
       color: colors.text.primary,
     },
-  },
-  
-  // Section Styles
-  section: {
-    container: {
-      marginBottom: spacing.lg,
-    },
-    title: {
-      fontSize: typography.sizes.lg,
-      fontWeight: typography.weights.semibold,
-      color: colors.text.primary,
-      marginBottom: spacing.md,
-      paddingHorizontal: spacing.lg,
-    },
-  },
-};
-
-// Layout Helpers
-export const layout = {
-  center: {
-    justifyContent: 'center' as const,
-    alignItems: 'center' as const,
-  },
-  row: {
-    flexDirection: 'row' as const,
-    alignItems: 'center' as const,
-  },
-  spaceBetween: {
-    flexDirection: 'row' as const,
-    justifyContent: 'space-between' as const,
-    alignItems: 'center' as const,
-  },
-  spaceAround: {
-    flexDirection: 'row' as const,
-    justifyContent: 'space-around' as const,
-    alignItems: 'center' as const,
   },
 };

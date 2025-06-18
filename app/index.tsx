@@ -9,50 +9,50 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../constants/colors';
-import { spacing, typography, borderRadius, shadows, layout } from '../constants/styles';
+import { colors, gradients } from '../constants/colors';
+import { spacing, typography, borderRadius, shadows } from '../constants/styles';
 import ProductCard from '../components/ProductCard';
 import CustomButton from '../components/CustomButton';
 
-// Altın sektörü için özel veriler
-const goldCategories = [
-  { id: 'rings', name: 'Yüzük', icon: '💍', color: colors.gold.primary },
-  { id: 'necklaces', name: 'Kolye', icon: '📿', color: colors.gold.secondary },
-  { id: 'bracelets', name: 'Bilezik', icon: '🥇', color: colors.gold.dark },
-  { id: 'earrings', name: 'Küpe', icon: '👂', color: colors.gold.accent },
-  { id: 'chains', name: 'Zincir', icon: '⛓️', color: colors.gold.light },
-  { id: 'coins', name: 'Altın', icon: '🪙', color: colors.gold.primary },
+// Kategoriler
+const categories = [
+  { id: 'rings', name: 'Yüzük', icon: '💍', color: colors.primary },
+  { id: 'necklaces', name: 'Kolye', icon: '📿', color: colors.secondary },
+  { id: 'bracelets', name: 'Bilezik', icon: '🥇', color: colors.accent },
+  { id: 'earrings', name: 'Küpe', icon: '👂', color: colors.success },
+  { id: 'chains', name: 'Zincir', icon: '⛓️', color: colors.gray },
+  { id: 'coins', name: 'Altın', icon: '🪙', color: colors.primary },
 ];
 
 const featuredProducts = [
   {
     id: '1',
-    name: '22 Ayar Altın Yüzük',
-    price: '15.000 TL',
-    originalPrice: '18.000 TL',
+    name: 'Zarif Altın Yüzük',
+    price: '25.000 TL',
+    originalPrice: '30.000 TL',
     image: '💍',
     category: 'Yüzük',
     location: 'İstanbul',
-    rating: 4.8,
-  },
-  {
-    id: '2',
-    name: '24 Ayar Altın Bilezik',
-    price: '25.000 TL',
-    originalPrice: '28.000 TL',
-    image: '🥇',
-    category: 'Bilezik',
-    location: 'Ankara',
     rating: 4.9,
   },
   {
+    id: '2',
+    name: 'Minimal Altın Bilezik',
+    price: '45.000 TL',
+    originalPrice: '52.000 TL',
+    image: '🥇',
+    category: 'Bilezik',
+    location: 'Ankara',
+    rating: 5.0,
+  },
+  {
     id: '3',
-    name: '18 Ayar Altın Kolye',
-    price: '12.000 TL',
+    name: 'Sade Altın Kolye',
+    price: '35.000 TL',
     image: '📿',
     category: 'Kolye',
     location: 'İzmir',
-    rating: 4.7,
+    rating: 4.8,
   },
 ];
 
@@ -60,7 +60,7 @@ const trendingProducts = [
   {
     id: '4',
     name: 'Gram Altın',
-    price: '2.500 TL',
+    price: '5.000 TL',
     image: '🪙',
     category: 'Altın',
     location: 'Bursa',
@@ -68,7 +68,7 @@ const trendingProducts = [
   {
     id: '5',
     name: 'Altın Set',
-    price: '35.000 TL',
+    price: '75.000 TL',
     image: '💎',
     category: 'Set',
     location: 'İstanbul',
@@ -76,7 +76,7 @@ const trendingProducts = [
   {
     id: '6',
     name: 'Altın Küpe',
-    price: '8.500 TL',
+    price: '15.000 TL',
     image: '👂',
     category: 'Küpe',
     location: 'Ankara',
@@ -86,6 +86,7 @@ const trendingProducts = [
 export default function HomePage() {
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [isLoggedIn] = useState(false);
 
   const handleCategoryPress = (categoryId: string) => {
     setSelectedCategory(categoryId);
@@ -110,24 +111,29 @@ export default function HomePage() {
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <Text style={styles.headerTitle}>Tedarik Ağı</Text>
-            <Text style={styles.headerSubtitle}>Altın Sektörü</Text>
+            <Text style={styles.headerSubtitle}>Modern B2B Platform</Text>
           </View>
-          <TouchableOpacity onPress={() => router.push('/profile')}>
-            <Ionicons name="person-circle-outline" size={32} color={colors.text.primary} />
-          </TouchableOpacity>
+          <View style={styles.headerActions}>
+            <TouchableOpacity style={styles.headerButton} onPress={() => router.push('/cart')}>
+              <Ionicons name="cart-outline" size={24} color={colors.text.primary} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.headerButton} onPress={() => router.push('/profile')}>
+              <Ionicons name="person-circle-outline" size={24} color={colors.text.primary} />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Hero Section */}
         <View style={styles.heroSection}>
           <View style={styles.heroContent}>
-            <Text style={styles.heroTitle}>Altın Alım Satım</Text>
+            <Text style={styles.heroTitle}>Altın Koleksiyonları</Text>
             <Text style={styles.heroSubtitle}>
-              Güvenilir tedarikçilerden kaliteli altın ürünleri
+              Sektörün en zarif ve modern ürünleri burada
             </Text>
             <CustomButton
               title="Ürünleri Keşfet"
               onPress={() => router.push('/products')}
-              variant="gold"
+              variant="primary"
               size="large"
               icon="search"
               style={styles.heroButton}
@@ -138,11 +144,11 @@ export default function HomePage() {
           </View>
         </View>
 
-        {/* Categories */}
+        {/* Kategoriler */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Kategoriler</Text>
           <View style={styles.categoriesGrid}>
-            {goldCategories.map((category) => (
+            {categories.map((category) => (
               <TouchableOpacity
                 key={category.id}
                 style={[
@@ -163,7 +169,7 @@ export default function HomePage() {
           </View>
         </View>
 
-        {/* Featured Products */}
+        {/* Öne Çıkan Ürünler */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Öne Çıkan Ürünler</Text>
@@ -186,7 +192,7 @@ export default function HomePage() {
           </ScrollView>
         </View>
 
-        {/* Trending Products */}
+        {/* Trend Ürünler */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Trend Ürünler</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -203,44 +209,57 @@ export default function HomePage() {
           </ScrollView>
         </View>
 
-        {/* Quick Actions */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Hızlı İşlemler</Text>
-          <View style={styles.quickActions}>
-            <TouchableOpacity style={styles.actionCard} onPress={() => router.push('/live')}>
-              <View style={[styles.actionIcon, { backgroundColor: colors.error }]}>
-                <Ionicons name="radio-outline" size={24} color={colors.text.inverse} />
-              </View>
-              <Text style={styles.actionText}>Canlı Satış</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.actionCard} onPress={() => router.push('/chat')}>
-              <View style={[styles.actionIcon, { backgroundColor: colors.secondary }]}>
-                <Ionicons name="chatbubbles-outline" size={24} color={colors.text.inverse} />
-              </View>
-              <Text style={styles.actionText}>Mesajlar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.actionCard} onPress={() => router.push('/cart')}>
-              <View style={[styles.actionIcon, { backgroundColor: colors.primary }]}>
-                <Ionicons name="cart-outline" size={24} color={colors.text.inverse} />
-              </View>
-              <Text style={styles.actionText}>Sepetim</Text>
-            </TouchableOpacity>
+        {/* İstatistikler */}
+        <View style={styles.statsSection}>
+          <View style={styles.statsCard}>
+            <Ionicons name="people" size={32} color={colors.primary} />
+            <Text style={styles.statsNumber}>1,250+</Text>
+            <Text style={styles.statsLabel}>Tedarikçi</Text>
+          </View>
+          <View style={styles.statsCard}>
+            <Ionicons name="star" size={32} color={colors.primary} />
+            <Text style={styles.statsNumber}>10,000+</Text>
+            <Text style={styles.statsLabel}>Ürün</Text>
+          </View>
+          <View style={styles.statsCard}>
+            <Ionicons name="trophy" size={32} color={colors.primary} />
+            <Text style={styles.statsNumber}>4.9</Text>
+            <Text style={styles.statsLabel}>Müşteri Puanı</Text>
           </View>
         </View>
 
-        {/* Stats Section */}
-        <View style={styles.statsSection}>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>500+</Text>
-            <Text style={styles.statLabel}>Ürün</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>50+</Text>
-            <Text style={styles.statLabel}>Tedarikçi</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>1000+</Text>
-            <Text style={styles.statLabel}>Müşteri</Text>
+        {/* CTA */}
+        <View style={styles.ctaSection}>
+          <View style={styles.ctaContent}>
+            {isLoggedIn ? (
+              <>
+                <Text style={styles.ctaTitle}>Hoş geldiniz!</Text>
+                <Text style={styles.ctaSubtitle}>Profilinizi ve siparişlerinizi görüntüleyin.</Text>
+                <CustomButton
+                  title="Profilim"
+                  onPress={() => router.push('/profile')}
+                  variant="primary"
+                  size="large"
+                  icon="person"
+                  style={styles.ctaButton}
+                />
+              </>
+            ) : (
+              <>
+                <Text style={styles.ctaTitle}>Hemen Üye Olun</Text>
+                <Text style={styles.ctaSubtitle}>
+                  Zarif fırsatlar ve modern hizmetler için kaydolun
+                </Text>
+                <CustomButton
+                  title="Üye Ol"
+                  onPress={() => router.push('/auth/register')}
+                  variant="accent"
+                  size="large"
+                  icon="person-add"
+                  style={styles.ctaButton}
+                />
+              </>
+            )}
           </View>
         </View>
       </ScrollView>
@@ -254,155 +273,186 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.primary,
   },
   header: {
-    ...layout.spaceBetween,
-    padding: spacing.lg,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.lg,
     backgroundColor: colors.background.secondary,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.gray[200],
+    ...shadows.subtle,
   },
   headerLeft: {
     flex: 1,
   },
   headerTitle: {
     fontSize: typography.sizes.xl,
-    fontWeight: '700' as const,
-    color: colors.text.primary,
+    fontWeight: '700',
+    color: colors.primary,
   },
   headerSubtitle: {
     fontSize: typography.sizes.sm,
-    color: colors.gold.primary,
-    fontWeight: '600' as const,
+    color: colors.text.secondary,
+    marginTop: spacing.xs,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerButton: {
+    padding: spacing.sm,
+    marginLeft: spacing.sm,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.background.card,
   },
   heroSection: {
-    backgroundColor: colors.gold.light,
-    padding: spacing.xl,
-    margin: spacing.lg,
-    borderRadius: borderRadius.xl,
-    ...layout.row,
-    ...shadows.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.xxl,
+    backgroundColor: colors.background.secondary,
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.lg,
+    borderRadius: borderRadius.lg,
+    ...shadows.soft,
   },
   heroContent: {
     flex: 1,
   },
   heroTitle: {
-    fontSize: typography.sizes.xxxl,
-    fontWeight: '700' as const,
-    color: colors.text.primary,
+    fontSize: typography.sizes.display,
+    fontWeight: '700',
+    color: colors.primary,
     marginBottom: spacing.sm,
   },
   heroSubtitle: {
     fontSize: typography.sizes.md,
     color: colors.text.secondary,
     marginBottom: spacing.lg,
-    lineHeight: 24,
   },
   heroButton: {
-    alignSelf: 'flex-start',
+    marginTop: spacing.md,
+    minWidth: 180,
   },
   heroIcon: {
-    ...layout.center,
     width: 80,
     height: 80,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.background.card,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: spacing.lg,
   },
   heroEmoji: {
-    fontSize: 60,
+    fontSize: 40,
   },
   section: {
-    marginBottom: spacing.xl,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.xl,
   },
   sectionHeader: {
-    ...layout.spaceBetween,
-    paddingHorizontal: spacing.lg,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: spacing.md,
   },
   sectionTitle: {
-    fontSize: typography.sizes.lg,
-    fontWeight: '600' as const,
+    fontSize: typography.sizes.xl,
+    fontWeight: '700',
     color: colors.text.primary,
-    paddingHorizontal: spacing.lg,
-    marginBottom: spacing.md,
+    marginBottom: spacing.sm,
   },
   seeAllText: {
+    fontSize: typography.sizes.sm,
     color: colors.primary,
-    fontSize: typography.sizes.md,
-    fontWeight: '600' as const,
+    fontWeight: '600',
   },
   categoriesGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: spacing.lg,
-    gap: spacing.sm,
+    justifyContent: 'space-between',
+    gap: spacing.md,
   },
   categoryCard: {
-    backgroundColor: colors.background.secondary,
-    padding: spacing.md,
-    borderRadius: borderRadius.lg,
-    alignItems: 'center',
     width: '30%',
-    aspectRatio: 1,
-    ...shadows.sm,
+    backgroundColor: colors.background.card,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    alignItems: 'center',
+    ...shadows.subtle,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    marginBottom: spacing.md,
   },
   categoryIcon: {
-    fontSize: 32,
+    fontSize: 28,
     marginBottom: spacing.sm,
   },
   categoryName: {
     fontSize: typography.sizes.sm,
-    fontWeight: '600' as const,
     color: colors.text.primary,
     textAlign: 'center',
   },
   featuredProductContainer: {
-    paddingHorizontal: spacing.sm,
     width: 280,
+    marginRight: spacing.lg,
   },
   trendingProductContainer: {
-    paddingHorizontal: spacing.sm,
-  },
-  quickActions: {
-    ...layout.spaceAround,
-    paddingHorizontal: spacing.lg,
-  },
-  actionCard: {
-    backgroundColor: colors.background.secondary,
-    padding: spacing.lg,
-    borderRadius: borderRadius.lg,
-    alignItems: 'center',
-    ...shadows.sm,
-  },
-  actionIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: borderRadius.full,
-    ...layout.center,
-    marginBottom: spacing.sm,
-  },
-  actionText: {
-    fontSize: typography.sizes.sm,
-    fontWeight: '600' as const,
-    color: colors.text.primary,
+    width: 220,
+    marginRight: spacing.lg,
   },
   statsSection: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingHorizontal: spacing.lg,
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.xl,
     paddingVertical: spacing.xl,
     backgroundColor: colors.background.secondary,
-    margin: spacing.lg,
+    marginHorizontal: spacing.lg,
+    marginVertical: spacing.lg,
     borderRadius: borderRadius.lg,
-    ...shadows.sm,
+    ...shadows.soft,
   },
-  statCard: {
+  statsCard: {
     alignItems: 'center',
+    flex: 1,
   },
-  statNumber: {
-    fontSize: typography.sizes.xxl,
-    fontWeight: '700' as const,
-    color: colors.gold.primary,
+  statsNumber: {
+    fontSize: typography.sizes.xl,
+    fontWeight: '700',
+    color: colors.primary,
+    marginTop: spacing.sm,
+    marginBottom: spacing.xs,
   },
-  statLabel: {
+  statsLabel: {
     fontSize: typography.sizes.sm,
     color: colors.text.secondary,
-    marginTop: spacing.xs,
+    textAlign: 'center',
+    fontWeight: '500',
+  },
+  ctaSection: {
+    backgroundColor: colors.background.card,
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.xxl,
+    borderRadius: borderRadius.lg,
+    padding: spacing.xxl,
+    ...shadows.soft,
+  },
+  ctaContent: {
+    alignItems: 'center',
+  },
+  ctaTitle: {
+    fontSize: typography.sizes.xl,
+    fontWeight: '700',
+    color: colors.primary,
+    marginBottom: spacing.sm,
+    textAlign: 'center',
+  },
+  ctaSubtitle: {
+    fontSize: typography.sizes.md,
+    color: colors.text.secondary,
+    textAlign: 'center',
+    marginBottom: spacing.lg,
+  },
+  ctaButton: {
+    minWidth: 180,
   },
 }); 

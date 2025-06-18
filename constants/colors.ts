@@ -1,82 +1,57 @@
-// Ana Renkler
+// Elegant Minimal Color Palette
 export const colors = {
-  // Altın Sektörü Renkleri
-  gold: {
-    primary: '#FFD700',      // Altın sarısı
-    secondary: '#FFA500',    // Turuncu altın
-    dark: '#B8860B',         // Koyu altın
-    light: '#FFF8DC',        // Açık altın
-    accent: '#DAA520',       // Altın vurgu
-  },
+  // Zarif Ana Renkler
+  primary: '#3A5A98',        // Soft Blue
+  secondary: '#7BC6CC',      // Pastel Turquoise
+  accent: '#F6C90E',         // Soft Gold Accent
+  success: '#4BBF73',        // Soft Green
+  warning: '#F6C90E',        // Soft Yellow
+  error: '#E57373',          // Soft Red
 
-  // Genel Renkler
-  primary: '#007AFF',        // Ana mavi
-  secondary: '#4CAF50',      // Yeşil
-  success: '#4CAF50',        // Başarı
-  warning: '#FF9800',        // Uyarı
-  error: '#F44336',          // Hata
-  info: '#2196F3',           // Bilgi
-
-  // Nötr Renkler
+  // Nötr ve Pastel Tonlar
   white: '#FFFFFF',
-  black: '#000000',
-  gray: {
-    50: '#FAFAFA',
-    100: '#F5F5F5',
-    200: '#EEEEEE',
-    300: '#E0E0E0',
-    400: '#BDBDBD',
-    500: '#9E9E9E',
-    600: '#757575',
-    700: '#616161',
-    800: '#424242',
-    900: '#212121',
-  },
+  offWhite: '#FAFAFA',
+  lightGray: '#F3F4F6',
+  gray: '#D1D5DB',
+  midGray: '#A0AEC0',
+  darkGray: '#4B5563',
+  black: '#22292F',
 
-  // Arka Plan Renkleri
+  // Arka Planlar
   background: {
-    primary: '#F8F9FA',
-    secondary: '#FFFFFF',
+    primary: '#FFFFFF',
+    secondary: '#FAFAFA',
     card: '#FFFFFF',
-    modal: 'rgba(0, 0, 0, 0.5)',
+    muted: '#F3F4F6',
+    overlay: 'rgba(60, 60, 60, 0.04)',
   },
 
   // Metin Renkleri
   text: {
-    primary: '#333333',
-    secondary: '#666666',
-    tertiary: '#999999',
+    primary: '#22292F',
+    secondary: '#4B5563',
+    tertiary: '#A0AEC0',
     inverse: '#FFFFFF',
-    disabled: '#CCCCCC',
+    accent: '#3A5A98',
+    muted: '#7C8BA1',
   },
 
-  // Gölge Renkleri
+  // Border ve Gölge
+  border: {
+    light: '#E5E7EB',
+    medium: '#D1D5DB',
+    dark: '#A0AEC0',
+    accent: '#3A5A98',
+  },
   shadow: {
-    light: 'rgba(0, 0, 0, 0.1)',
-    medium: 'rgba(0, 0, 0, 0.15)',
-    dark: 'rgba(0, 0, 0, 0.25)',
+    subtle: 'rgba(60, 60, 60, 0.04)',
+    soft: 'rgba(60, 60, 60, 0.08)',
+    medium: 'rgba(60, 60, 60, 0.12)',
   },
 };
 
-// Sektör Renkleri
-export const sectorColors = {
-  jewelry: colors.gold.primary,
-  food: '#4CAF50',
-  textile: '#2196F3',
-  electronics: '#9C27B0',
-  construction: '#FF9800',
-  automotive: '#F44336',
-};
-
-// Gradient Renkleri
 export const gradients = {
-  gold: {
-    primary: ['#FFD700', '#FFA500'],
-    secondary: ['#FFF8DC', '#FFD700'],
-    dark: ['#B8860B', '#DAA520'],
-  },
-  blue: {
-    primary: ['#007AFF', '#0056CC'],
-    secondary: ['#E3F2FD', '#007AFF'],
-  },
+  blue: ['#7BC6CC', '#3A5A98'],
+  soft: ['#FFFFFF', '#F3F4F6'],
+  gold: ['#F6C90E', '#FFFBEA'],
 };

@@ -14,7 +14,7 @@ import { spacing, typography, borderRadius, shadows } from '../constants/styles'
 interface CustomButtonProps {
   title: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'gold' | 'outline' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'accent' | 'ghost';
   size?: 'small' | 'medium' | 'large';
   disabled?: boolean;
   loading?: boolean;
@@ -41,50 +41,54 @@ export default function CustomButton({
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      borderRadius: borderRadius.md,
-      ...shadows.sm,
+      borderRadius: borderRadius.lg,
     };
 
     // Size styles
     switch (size) {
       case 'small':
         baseStyle.paddingVertical = spacing.sm;
-        baseStyle.paddingHorizontal = spacing.md;
+        baseStyle.paddingHorizontal = spacing.lg;
         break;
       case 'large':
-        baseStyle.paddingVertical = spacing.lg;
-        baseStyle.paddingHorizontal = spacing.xl;
+        baseStyle.paddingVertical = spacing.xl;
+        baseStyle.paddingHorizontal = spacing.xxl;
         break;
       default:
         baseStyle.paddingVertical = spacing.md;
-        baseStyle.paddingHorizontal = spacing.lg;
+        baseStyle.paddingHorizontal = spacing.xl;
     }
 
     // Variant styles
     switch (variant) {
       case 'primary':
         baseStyle.backgroundColor = colors.primary;
+        baseStyle.borderWidth = 0;
+        Object.assign(baseStyle, shadows.soft);
         break;
       case 'secondary':
-        baseStyle.backgroundColor = colors.secondary;
-        break;
-      case 'gold':
-        baseStyle.backgroundColor = colors.gold.primary;
-        break;
-      case 'outline':
-        baseStyle.backgroundColor = 'transparent';
+        baseStyle.backgroundColor = colors.background.secondary;
         baseStyle.borderWidth = 1;
         baseStyle.borderColor = colors.primary;
+        Object.assign(baseStyle, shadows.subtle);
+        break;
+      case 'accent':
+        baseStyle.backgroundColor = colors.accent;
+        baseStyle.borderWidth = 0;
+        Object.assign(baseStyle, shadows.soft);
         break;
       case 'ghost':
         baseStyle.backgroundColor = 'transparent';
+        baseStyle.borderWidth = 0;
         break;
     }
 
     // Disabled state
     if (disabled) {
-      baseStyle.backgroundColor = colors.gray[300];
+      baseStyle.backgroundColor = colors.gray;
       baseStyle.opacity = 0.6;
+      baseStyle.shadowOpacity = 0;
+      baseStyle.elevation = 0;
     }
 
     return { ...baseStyle, ...style };
@@ -100,11 +104,10 @@ export default function CustomButton({
     // Variant text colors
     switch (variant) {
       case 'primary':
-      case 'secondary':
-      case 'gold':
+      case 'accent':
         baseStyle.color = colors.text.inverse;
         break;
-      case 'outline':
+      case 'secondary':
         baseStyle.color = colors.primary;
         break;
       case 'ghost':
@@ -124,7 +127,7 @@ export default function CustomButton({
 
     // Disabled state
     if (disabled) {
-      baseStyle.color = colors.text.disabled;
+      baseStyle.color = colors.text.tertiary;
     }
 
     return { ...baseStyle, ...textStyle };
@@ -133,16 +136,20 @@ export default function CustomButton({
   const renderIcon = () => {
     if (!icon || loading) return null;
 
-    const iconColor = variant === 'outline' || variant === 'ghost' 
-      ? colors.primary 
-      : colors.text.inverse;
-
+    let iconColor = colors.text.inverse;
+    if (variant === 'secondary' || variant === 'ghost') {
+      iconColor = colors.primary;
+    }
+    if (disabled) {
+      iconColor = colors.text.tertiary;
+    }
+    const iconSize = size === 'small' ? 16 : size === 'large' ? 24 : 20;
     return (
-      <Ionicons 
-        name={icon} 
-        size={size === 'small' ? 16 : size === 'large' ? 24 : 20} 
-        color={disabled ? colors.text.disabled : iconColor}
-        style={{ 
+      <Ionicons
+        name={icon}
+        size={iconSize}
+        color={iconColor}
+        style={{
           marginRight: iconPosition === 'left' ? spacing.xs : 0,
           marginLeft: iconPosition === 'right' ? spacing.xs : 0,
         }}
@@ -158,9 +165,9 @@ export default function CustomButton({
       activeOpacity={0.8}
     >
       {loading ? (
-        <ActivityIndicator 
-          size="small" 
-          color={variant === 'outline' || variant === 'ghost' ? colors.primary : colors.text.inverse} 
+        <ActivityIndicator
+          size="small"
+          color={variant === 'secondary' || variant === 'ghost' ? colors.primary : colors.text.inverse}
         />
       ) : (
         <>
@@ -173,6 +180,4 @@ export default function CustomButton({
   );
 }
 
-const styles = StyleSheet.create({
-  // Additional styles can be added here if needed
-});
+const styles = StyleSheet.create({});
