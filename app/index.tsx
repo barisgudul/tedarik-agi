@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   SafeAreaView,
+  Dimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -83,6 +84,8 @@ const trendingProducts = [
   },
 ];
 
+const screenWidth = Dimensions.get('window').width;
+
 export default function HomePage() {
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -106,7 +109,11 @@ export default function HomePage() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        style={{ flex: 1 }}
+        contentContainerStyle={{ flexGrow: 1 }}
+      >
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
@@ -177,7 +184,11 @@ export default function HomePage() {
               <Text style={styles.seeAllText}>Tümünü Gör</Text>
             </TouchableOpacity>
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingLeft: 0, paddingRight: spacing.xl }}
+          >
             {featuredProducts.map((product) => (
               <View key={product.id} style={styles.featuredProductContainer}>
                 <ProductCard
@@ -195,7 +206,11 @@ export default function HomePage() {
         {/* Trend Ürünler */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Trend Ürünler</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingLeft: 0, paddingRight: spacing.xl }}
+          >
             {trendingProducts.map((product) => (
               <View key={product.id} style={styles.trendingProductContainer}>
                 <ProductCard
@@ -393,11 +408,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   featuredProductContainer: {
-    width: 280,
     marginRight: spacing.lg,
   },
   trendingProductContainer: {
-    width: 220,
     marginRight: spacing.lg,
   },
   statsSection: {
