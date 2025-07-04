@@ -1,12 +1,18 @@
 import { Stack } from 'expo-router';
+import 'react-native-reanimated';
 
-export default function Layout() {
+export default function RootLayout() {
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-        animation: 'slide_from_right',
-      }}
-    />
+    <Stack>
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="product/[id]"
+        options={{
+          presentation: 'modal',
+          headerShown: true,
+          title: 'Ürün Detayı',
+        }}
+      />
+    </Stack>
   );
-} 
+}

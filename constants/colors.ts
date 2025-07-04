@@ -1,57 +1,36 @@
 // Elegant Minimal Color Palette
 export const colors = {
-  // Zarif Ana Renkler
-  primary: '#3A5A98',        // Soft Blue
-  secondary: '#7BC6CC',      // Pastel Turquoise
-  accent: '#F6C90E',         // Soft Gold Accent
-  success: '#4BBF73',        // Soft Green
-  warning: '#F6C90E',        // Soft Yellow
-  error: '#E57373',          // Soft Red
+  // === Ana Renkler ===
+  primary: {
+    DEFAULT: '#6D28D9', // Derin, mücevher tonu bir mor (Ametist)
+    light: '#8B5CF6',
+    dark: '#5B21B6',
+  },
+  secondary: {
+    DEFAULT: '#D4AF37', // Klasik, sıcak bir altın rengi
+    light: '#E7C96D',
+  },
 
-  // Nötr ve Pastel Tonlar
-  white: '#FFFFFF',
-  offWhite: '#FAFAFA',
-  lightGray: '#F3F4F6',
-  gray: '#D1D5DB',
-  midGray: '#A0AEC0',
-  darkGray: '#4B5563',
-  black: '#22292F',
-
-  // Arka Planlar
+  // === Nötr Renkler (Çok Önemli!) ===
   background: {
-    primary: '#FFFFFF',
-    secondary: '#FAFAFA',
-    card: '#FFFFFF',
-    muted: '#F3F4F6',
-    overlay: 'rgba(60, 60, 60, 0.04)',
+    DEFAULT: '#F9FAFB', // Çok hafif kırık, temiz bir beyaz
+    dark: '#111827',     // Koyu mod için - Zengin bir "off-black"
   },
-
-  // Metin Renkleri
+  surface: {
+    DEFAULT: '#FFFFFF', // Kartlar ve pop-up'lar için saf beyaz
+    dark: '#1F2937',     // Koyu mod kart yüzeyi
+  },
   text: {
-    primary: '#22292F',
-    secondary: '#4B5563',
-    tertiary: '#A0AEC0',
-    inverse: '#FFFFFF',
-    accent: '#3A5A98',
-    muted: '#7C8BA1',
+    primary: '#1F2937',   // Ana metin rengi - Saf siyahtan daha yumuşak
+    secondary: '#6B7280', // İkincil, daha az önemli metinler
+    tertiary: '#9CA3AF',  // En az önemli, placeholder gibi metinler
+    onDark: '#F9FAFB',    // Koyu arka plan üzerindeki metinler
+    link: '#6D28D9',      // Tıklanabilir linkler için ana renk
   },
-
-  // Border ve Gölge
-  border: {
-    light: '#E5E7EB',
-    medium: '#D1D5DB',
-    dark: '#A0AEC0',
-    accent: '#3A5A98',
-  },
-  shadow: {
-    subtle: 'rgba(60, 60, 60, 0.04)',
-    soft: 'rgba(60, 60, 60, 0.08)',
-    medium: 'rgba(60, 60, 60, 0.12)',
-  },
-};
-
-export const gradients = {
-  blue: ['#7BC6CC', '#3A5A98'],
-  soft: ['#FFFFFF', '#F3F4F6'],
-  gold: ['#F6C90E', '#FFFBEA'],
+  
+  // === Vurgu ve Durum Renkleri ===
+  border: '#E5E7EB',       // İnce çizgiler ve ayraçlar için
+  success: '#10B981',      // Başarı durumu
+  warning: '#F59E0B',      // Uyarı
+  error: '#EF4444',        // Hata
 };
