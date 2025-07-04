@@ -1,3 +1,4 @@
+// app/_layout.tsx
 import { Stack } from 'expo-router';
 import 'react-native-reanimated';
 
@@ -8,9 +9,15 @@ export default function RootLayout() {
       <Stack.Screen
         name="product/[id]"
         options={{
+          headerShown: false,
           presentation: 'modal',
-          headerShown: true,
-          title: 'Ürün Detayı',
+        }}
+      />
+      <Stack.Screen
+        name="seller/[id]"
+        options={{
+          headerShown: false,
+          presentation: 'modal',
         }}
       />
     </Stack>

@@ -1,5 +1,6 @@
 // constants/styles.ts
-import { colors } from './colors'; // colors.ts'ten import ediyor
+import { colors } from './colors';
+export { colors };
 
 export const spacing = {
   xs: 4,
@@ -60,6 +61,3 @@ export const typography = {
     color: colors.text.primary,
   },
 };
-
-// HER ŞEYİ BİRLİKTE EXPORT EDİYORUZ
-export { colors };

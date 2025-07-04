@@ -4,10 +4,10 @@ import { View, Text, StyleSheet, FlatList } from 'react-native';
 import BannerCarousel from '../../components/BannerCarousel';
 import ProductCard from '../../components/ProductCard';
 import { products as allProducts } from '../../data/sampleProducts';
+import { Product } from '../../types';
 import { useRouter } from 'expo-router';
 import { useFilterStore } from '../../store/filterStore';
 import { spacing, colors, typography } from '../../constants/styles';
-import { Product } from '../../types';
 
 // Veri tipi: Ya tek bir ürün (büyük satır) ya da iki ürün (küçük satır)
 type ProductRow = Product[];
@@ -46,17 +46,13 @@ export default function Home() {
     return rows;
   }, [filteredProducts]);
 
-  const renderRow = ({ item, index }: { item: ProductRow; index: number }) => {
+  const renderRow = ({ item }: { item: ProductRow }) => {
     // Eğer satırda tek bir ürün varsa, bu bizim "büyük" satırımızdır.
     if (item.length === 1) {
       const product = item[0];
       return (
         <View style={styles.rowWrapper}>
-          <ProductCard
-            product={product}
-            variant="featured" // Büyük kart varyantı
-            onPress={() => router.push(`/product/${product.id}`)}
-          />
+          <ProductCard product={product} variant="featured" onPress={() => router.push(`/product/${product.id}`)} />
         </View>
       );
     }
@@ -66,21 +62,11 @@ export default function Home() {
       return (
         <View style={[styles.rowWrapper, styles.smallRowContainer]}>
           <View style={styles.smallCardWrapper}>
-            <ProductCard
-              product={item[0]}
-              variant="default" // Küçük kart varyantı
-              onPress={() => router.push(`/product/${item[0].id}`)}
-            />
+            <ProductCard product={item[0]} variant="default" onPress={() => router.push(`/product/${item[0].id}`)} />
           </View>
           <View style={styles.smallCardWrapper}>
             {/* Eğer tek ürün kaldıysa boşluk render etme */}
-            {item[1] && (
-              <ProductCard
-                product={item[1]}
-                variant="default" // Küçük kart varyantı
-                onPress={() => router.push(`/product/${item[1].id}`)}
-              />
-            )}
+            {item[1] && <ProductCard product={item[1]} variant="default" onPress={() => router.push(`/product/${item[1].id}`)} />}
           </View>
         </View>
       );
@@ -102,7 +88,7 @@ export default function Home() {
       )}
       data={productRows}
       renderItem={renderRow}
-      keyExtractor={(item, index) => `row-${index}`}
+      keyExtractor={(item, index) => `row-${index}-${item[0].id}`}
       ListEmptyComponent={<Text style={styles.emptyText}>Bu kategoride ürün bulunamadı.</Text>}
     />
   );
@@ -118,8 +104,8 @@ const styles = StyleSheet.create({
     paddingTop: spacing.xl,
     paddingBottom: spacing.md,
   },
-  collectionTitle: { ...typography.h2 },
-  collectionSubtitle: { ...typography.body },
+  collectionTitle: { ...typography.h2, color: colors.text.primary },
+  collectionSubtitle: { ...typography.body, color: colors.text.secondary },
   rowWrapper: {
     paddingHorizontal: spacing.lg,
     marginBottom: spacing.lg,
@@ -135,5 +121,6 @@ const styles = StyleSheet.create({
     ...typography.body,
     textAlign: 'center',
     marginTop: spacing.xxl,
+    color: colors.text.secondary,
   },
 });

@@ -1,3 +1,4 @@
+// File: components/CustomButton.tsx
 import React from 'react';
 import {
   TouchableOpacity,
@@ -51,10 +52,10 @@ export default function CustomButton({
         baseStyle.paddingHorizontal = spacing.lg;
         break;
       case 'large':
-        baseStyle.paddingVertical = spacing.xl;
-        baseStyle.paddingHorizontal = spacing.xxl;
+        baseStyle.paddingVertical = spacing.lg;
+        baseStyle.paddingHorizontal = spacing.xl;
         break;
-      default:
+      default: // medium
         baseStyle.paddingVertical = spacing.md;
         baseStyle.paddingHorizontal = spacing.xl;
     }
@@ -62,20 +63,20 @@ export default function CustomButton({
     // Variant styles
     switch (variant) {
       case 'primary':
-        baseStyle.backgroundColor = colors.primary;
+        baseStyle.backgroundColor = colors.primary.DEFAULT;
         baseStyle.borderWidth = 0;
-        Object.assign(baseStyle, shadows.soft);
+        Object.assign(baseStyle, shadows.medium);
         break;
       case 'secondary':
-        baseStyle.backgroundColor = colors.background.secondary;
+        baseStyle.backgroundColor = colors.surface.DEFAULT;
         baseStyle.borderWidth = 1;
-        baseStyle.borderColor = colors.primary;
+        baseStyle.borderColor = colors.primary.DEFAULT;
         Object.assign(baseStyle, shadows.subtle);
         break;
       case 'accent':
-        baseStyle.backgroundColor = colors.accent;
+        baseStyle.backgroundColor = colors.secondary.DEFAULT;
         baseStyle.borderWidth = 0;
-        Object.assign(baseStyle, shadows.soft);
+        Object.assign(baseStyle, shadows.medium);
         break;
       case 'ghost':
         baseStyle.backgroundColor = 'transparent';
@@ -85,18 +86,31 @@ export default function CustomButton({
 
     // Disabled state
     if (disabled) {
-      baseStyle.backgroundColor = colors.gray;
-      baseStyle.opacity = 0.6;
+      baseStyle.backgroundColor = colors.border;
+      baseStyle.opacity = 0.7;
       baseStyle.shadowOpacity = 0;
       baseStyle.elevation = 0;
+      baseStyle.borderColor = 'transparent';
     }
 
     return { ...baseStyle, ...style };
   };
 
   const getTextStyle = (): TextStyle => {
+    let fontSize: number;
+    switch (size) {
+      case 'small':
+        fontSize = 14;
+        break;
+      case 'large':
+        fontSize = 18;
+        break;
+      default: // medium
+        fontSize = 16;
+    }
+
     const baseStyle: TextStyle = {
-      fontSize: typography.sizes.md,
+      fontSize: fontSize,
       fontWeight: '600' as const,
       textAlign: 'center',
     };
@@ -105,23 +119,13 @@ export default function CustomButton({
     switch (variant) {
       case 'primary':
       case 'accent':
-        baseStyle.color = colors.text.inverse;
+        baseStyle.color = colors.text.onDark;
         break;
       case 'secondary':
-        baseStyle.color = colors.primary;
+        baseStyle.color = colors.primary.DEFAULT;
         break;
       case 'ghost':
         baseStyle.color = colors.text.primary;
-        break;
-    }
-
-    // Size text adjustments
-    switch (size) {
-      case 'small':
-        baseStyle.fontSize = typography.sizes.sm;
-        break;
-      case 'large':
-        baseStyle.fontSize = typography.sizes.lg;
         break;
     }
 
@@ -136,9 +140,9 @@ export default function CustomButton({
   const renderIcon = () => {
     if (!icon || loading) return null;
 
-    let iconColor = colors.text.inverse;
+    let iconColor = colors.text.onDark;
     if (variant === 'secondary' || variant === 'ghost') {
-      iconColor = colors.primary;
+      iconColor = colors.primary.DEFAULT;
     }
     if (disabled) {
       iconColor = colors.text.tertiary;
@@ -167,7 +171,7 @@ export default function CustomButton({
       {loading ? (
         <ActivityIndicator
           size="small"
-          color={variant === 'secondary' || variant === 'ghost' ? colors.primary : colors.text.inverse}
+          color={variant === 'secondary' || variant === 'ghost' ? colors.primary.DEFAULT : colors.text.onDark}
         />
       ) : (
         <>

@@ -1,3 +1,4 @@
+// components/OverlayMenu.tsx
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Pressable, Platform, SafeAreaView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -58,7 +59,11 @@ export default function OverlayMenu({ isVisible, onClose }: OverlayMenuProps) {
     <Animated.View style={[styles.backdrop, backdropAnimatedStyle]}>
       {/* Arka planı buğulu hale getiren BlurView */}
       {Platform.OS === 'ios' && (
-        <BlurView style={StyleSheet.absoluteFill} blurType="dark" blurAmount={5} />
+        <BlurView 
+          style={StyleSheet.absoluteFill} 
+          tint="dark" 
+          intensity={25} 
+        />
       )}
 
       {/* Dışarıya tıklanınca kapatma işlevi */}

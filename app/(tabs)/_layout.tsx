@@ -26,13 +26,6 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="profile"
         />
-        <Tabs.Screen
-          name="menu"
-          options={{
-            presentation: 'modal',
-            headerShown: false,
-          }}
-        />
       </Tabs>
       <OverlayMenu isVisible={isMenuVisible} onClose={closeMenu} />
     </>
