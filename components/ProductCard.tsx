@@ -25,18 +25,50 @@ export default function ProductCard({ product, variant = 'default', onPress }: P
         </View>
         <View style={styles.infoContainer}>
           <Text style={nameStyle} numberOfLines={2}>{product.name}</Text>
-          <Text style={styles.price}>{product.price}</Text>
+          {product.originalPrice ? (
+            // Alt alta dikey görünüm
+            <View style={styles.priceContainer}> 
+              <Text style={styles.originalPrice}>{product.originalPrice}</Text>
+              <Text style={styles.price}>{product.price}</Text>
+            </View>
+          ) : (
+            // Tek fiyat varsa normal görünüm
+            <Text style={[styles.price, {alignSelf: 'flex-start'}]}>{product.price}</Text>
+          )}
         </View>
       </TouchableOpacity>
     </Animated.View>
   );
 }
 
+// STİLLERİ İSTEĞİNE GÖRE YENİDEN DÜZENLEDİM
 const styles = StyleSheet.create({
   // Ortak Stiller
   image: { width: '100%', height: '100%' },
-  infoContainer: { padding: spacing.md },
-  price: { fontSize: 18, fontWeight: 'bold', color: colors.primary.DEFAULT },
+  infoContainer: { 
+    padding: spacing.md,
+    // Kart içindeki fiyatların sola hizalı olması daha iyi durur
+    alignItems: 'flex-start',
+  },
+  // --- Fiyat stilleri tamamen yenilendi ---
+  priceContainer: {
+    // Fiyatları sola hizalı tut
+    alignItems: 'flex-start',
+  },
+  originalPrice: {
+    fontSize: 22, // İSTEK: Üzeri çizili fiyat büyük
+    fontWeight: '400',
+    color: colors.text.primary, // Daha göze çarpıcı - ana metin rengi
+    textDecorationLine: 'line-through',
+    textDecorationColor: '#FF4444', // ÇİZGİNİN RENGİ kırmızı olsun
+    textDecorationStyle: 'solid',
+  },
+  price: { 
+    fontSize: 18, // İSTEK: İndirimli fiyat daha küçük
+    fontWeight: 'bold',
+    color: colors.primary.dark,
+    marginTop: -2, // Üstteki fiyata biraz daha yakın olsun
+  },
 
   // Default (Küçük Kart - 2'li satırda)
   defaultCard: {

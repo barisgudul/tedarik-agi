@@ -68,9 +68,22 @@ export default function ThePodiumPage() {
                     <Animated.Text style={styles.productName} entering={FadeIn.duration(800).delay(400)}>
                         {product.name}
                     </Animated.Text>
-                    <Animated.Text style={styles.productPrice} entering={FadeIn.duration(800).delay(500)}>
-                        {product.price}
-                    </Animated.Text>
+                    
+                    <Animated.View style={styles.priceContainerDetail} entering={FadeIn.duration(800).delay(500)}>
+                        {product.originalPrice ? (
+                            <>
+                                {/* --- ÜZERİ ÇİZİLİ FİYAT --- */}
+                                {/* İsteğine göre DAHA BÜYÜK ve DAHA BELİRGİN RENKTE */}
+                                <Text style={styles.productOriginalPrice}>{product.originalPrice}</Text>
+                                
+                                {/* --- İNDİRİMLİ FİYAT --- */}
+                                {/* DAHA KÜÇÜK ama yine de vurgulu */}
+                                <Text style={styles.productPrice}>{product.price}</Text>
+                            </>
+                        ) : (
+                            <Text style={[styles.productPrice, {fontSize: 32}]}>{product.price}</Text> // İndirimsiz ise normal boyutta
+                        )}
+                    </Animated.View>
                 </View>
                 <Animated.View style={styles.detailsContainer} entering={FadeIn.duration(800).delay(600)}>
                     {/* Satıcı Kartı */}
@@ -132,7 +145,7 @@ export default function ThePodiumPage() {
     );
 }
 
-// Stillerde değişiklik yapmaya gerek yok, aynı kalabilirler.
+// STİLLERİ İSTEĞİNE GÖRE TAMAMEN YENİLEDİM
 const styles = StyleSheet.create({
     container: { flex: 1 },
     centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
@@ -145,7 +158,25 @@ const styles = StyleSheet.create({
     imageCard: { width: '100%', height: 400, borderRadius: borderRadius.xl, backgroundColor: colors.surface.DEFAULT, ...shadows.medium, shadowColor: '#000000', shadowOpacity: 0.2, shadowRadius: 25, marginBottom: spacing.xl, },
     showcaseImage: { width: '100%', height: '100%', resizeMode: 'cover', borderRadius: borderRadius.xl, },
     productName: { ...typography.h1, color: colors.text.primary, fontSize: 36, textAlign: 'center', lineHeight: 44, },
-    productPrice: { ...typography.h2, color: colors.text.secondary, fontSize: 22, marginTop: spacing.sm, fontWeight: '400', },
+    priceContainerDetail: {
+        flexDirection: 'column',
+        alignItems: 'center',
+        marginTop: spacing.md,
+    },
+    productOriginalPrice: {
+        fontSize: 38, // İSTEK: Üzeri çizili fiyat büyük olacak
+        fontWeight: '500', // Ne çok ince ne çok kalın, okunabilir
+        color: colors.text.primary, // İSTEK: Daha göze çarpıcı - ana metin rengi
+        textDecorationLine: 'line-through',
+        textDecorationColor: '#FF4444', // ÇİZGİNİN RENGİ kırmızı olsun - daha dikkat çekici
+        textDecorationStyle: 'solid',
+        marginBottom: -spacing.xs, // Fiyatları birbirine yakın tut
+    },
+    productPrice: { 
+        fontSize: 28, // İSTEK: İndirimli fiyat daha küçük olacak
+        fontWeight: 'bold', // Ama yine de "kazanç" olduğunu belli etmesi için kalın
+        color: colors.primary.dark, // Markanın ana vurgu rengi
+    },
     detailsContainer: { 
         paddingHorizontal: spacing.lg,
         paddingBottom: spacing.lg,

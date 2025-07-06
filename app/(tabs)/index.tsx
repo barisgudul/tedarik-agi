@@ -1,7 +1,8 @@
-import React, { useMemo } from 'react';
+// app/(tabs)/index.tsx
+import React, { useMemo, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ImageBackground } from 'react-native';
+import Animated, { FadeInUp, useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
-import Animated, { FadeInUp } from 'react-native-reanimated';
 
 // Bileşenleri ve verileri import et
 import BannerCarousel from '../../components/BannerCarousel';
@@ -50,8 +51,36 @@ type ProductRow = Product[];
 
 export default function Home() {
   const router = useRouter();
+  const listRef = useRef<FlatList>(null);
+  
+  const showProducts = useFilterStore((state) => state.showProducts);
   const viewMode = useFilterStore((state) => state.viewMode);
   const selectedCategory = useFilterStore((state) => state.selectedCategory);
+  
+  // --- YUMUŞAK GEÇİŞ ANİMASYONU İÇİN PAYLAŞILAN DEĞER ---
+  const listOpacity = useSharedValue(1);
+
+  const animatedListStyle = useAnimatedStyle(() => {
+    return {
+      opacity: listOpacity.value,
+    };
+  });
+  
+  // --- FİLTRELEME İŞLEMİ VE GEÇİŞ KOREOGRAFİSİ ---
+  const handleFilterChange = useCallback((newCategory: string) => {
+    // 1. Listenin opaklığını yumuşak bir şekilde sıfıra indir
+    listOpacity.value = withTiming(0, { duration: 200 });
+
+    // 2. Liste en üste kaydırılsın
+    listRef.current?.scrollToOffset({ offset: 0, animated: true });
+
+    // 3. Kısa bir gecikmenin ardından (animasyonun bitmesine yakın) state'i güncelle
+    setTimeout(() => {
+      showProducts(newCategory);
+      // 4. State güncellendikten ve yeni içerik hazırlandıktan sonra opaklığı geri getir
+      listOpacity.value = withTiming(1, { duration: 300 });
+    }, 250); // Bu süre, opacity animasyonu + scroll animasyonu için zaman tanır
+  }, [showProducts, listOpacity]);
 
   // --- OPTİMUM SATICI SIRALAMASI ---
   const sortedSellers = useMemo(() => {
@@ -117,50 +146,55 @@ export default function Home() {
     );
   };
 
-  // --- ANA RENDER ---
-  if (viewMode === 'sellers') {
-    return (
-      <FlatList
-        style={styles.container}
-        data={sortedSellers} // SIRALANMIŞ VERİYİ KULLANIYORUZ
-        renderItem={renderSellerRow}
-        keyExtractor={(item) => item.id}
-        ListHeaderComponent={() => (
-          <View style={styles.collectionHeader}>
-            {/* BAŞLIK DEĞİŞTİRİLDİ */}
-            <Text style={styles.collectionTitle}>Öne Çıkan Satıcılar</Text>
-            <Text style={styles.collectionSubtitle}>Kullanıcılarımızın favorilerini keşfedin.</Text>
-          </View>
-        )}
-        ListEmptyComponent={<Text style={styles.emptyText}>Satıcı bulunamadı.</Text>}
-      />
-    );
-  }
+  // ANA RENDER FONKSİYONU
+  // Buradaki FlatList'e ref ve animasyonlu stili ekliyoruz.
+  const renderList = (data: any, renderItem: any) => (
+    <Animated.View style={[styles.listContainer, animatedListStyle]}>
+        <FlatList
+          ref={listRef}
+          data={data}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => viewMode === 'sellers' ? item.id : `row-${index}-${item[0].id}`}
+          ListHeaderComponent={() => (
+            viewMode === 'sellers' ? (
+              <View style={styles.collectionHeader}>
+                <Text style={styles.collectionTitle}>Öne Çıkan Satıcılar</Text>
+                <Text style={styles.collectionSubtitle}>Kullanıcılarımızın favorilerini keşfedin.</Text>
+              </View>
+            ) : (
+              <>
+                {/* BannerCarousel'a handleFilterChange fonksiyonunu prop olarak gönderiyoruz */}
+                <BannerCarousel onCategorySelect={handleFilterChange} />
+                <View style={styles.collectionHeader}>
+                  <Text style={styles.collectionTitle}>Yeni Sezon Koleksiyonu</Text>
+                  <Text style={styles.collectionSubtitle}>Özenle seçilmiş parçaları keşfedin.</Text>
+                </View>
+              </>
+            )
+          )}
+          ListEmptyComponent={<Text style={styles.emptyText}>Bu kategoride ürün bulunamadı.</Text>}
+        />
+    </Animated.View>
+  );
 
-  // Varsayılan olarak ürünleri göster
   return (
-    <FlatList
-      style={styles.container}
-      data={productRows}
-      renderItem={renderProductRow}
-      keyExtractor={(item, index) => `row-${index}-${item[0].id}`}
-      ListHeaderComponent={() => (
-        <>
-          <BannerCarousel />
-          <View style={styles.collectionHeader}>
-            <Text style={styles.collectionTitle}>Yeni Sezon Koleksiyonu</Text>
-            <Text style={styles.collectionSubtitle}>Özenle seçilmiş parçaları keşfedin.</Text>
-          </View>
-        </>
-      )}
-      ListEmptyComponent={<Text style={styles.emptyText}>Bu kategoride ürün bulunamadı.</Text>}
-    />
+    <View style={styles.container}>
+      {viewMode === 'sellers' 
+        ? renderList(sortedSellers, renderSellerRow)
+        : renderList(productRows, renderProductRow)}
+    </View>
   );
 }
 
-// ANA STİLLER (Değişiklik yok)
+// STİL DEĞİŞİKLİKLERİ
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background.DEFAULT, },
+  container: { 
+    flex: 1, 
+    backgroundColor: colors.background.DEFAULT,
+  },
+  listContainer: {
+    flex: 1,
+  },
   collectionHeader: { paddingHorizontal: spacing.lg, paddingTop: spacing.xl, paddingBottom: spacing.md, },
   collectionTitle: { ...typography.h2, color: colors.text.primary, },
   collectionSubtitle: { ...typography.body, color: colors.text.secondary, },

@@ -197,4 +197,4 @@ const styles = StyleSheet.create({
         width: '48.5%',
         marginBottom: spacing.lg,
     },
-});
+}); 

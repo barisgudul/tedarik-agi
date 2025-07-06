@@ -14,10 +14,11 @@ export interface Seller {
 export interface Product {
   id: string;
   name: string;
-  price: string;
+  price: string; // İndirimli fiyat bu alanda olacak
+  originalPrice?: string; // Opsiyonel: Üzeri çizilecek eski fiyat
   image: any;
   category: string;
-  location: string;
+  location?: string;
   sellerId: string; // Artık zorunlu
 }
 
