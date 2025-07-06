@@ -1,77 +1,89 @@
+// app/seller/[id].tsx
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ActivityIndicator, SafeAreaView } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
+import { BlurView } from 'expo-blur';
 
 import { sellers, products as allProducts } from '../../data/sampleProducts';
 import { ProductWithSellerId } from '../../types';
-import { colors } from '../../constants/colors';
-import { spacing, typography, borderRadius, shadows } from '../../constants/styles';
+import { colors, spacing, typography, borderRadius, shadows } from '../../constants/styles';
 import ProductCard from '../../components/ProductCard';
 
 export default function SellerProfilePage() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
 
-    // ID'ye göre satıcıyı ve ürünlerini bul
     const seller = useMemo(() => sellers.find(s => s.id === id), [id]);
     const sellerProducts = useMemo(() => (allProducts as ProductWithSellerId[]).filter(p => p.sellerId === id), [id]);
 
-    // Her ürüne seller alanını ekle (Product tipine dönüştür)
     const sellerProductsWithSeller = useMemo(() => {
         if (!seller) return [];
         return sellerProducts.map(p => ({ ...p, seller }));
     }, [sellerProducts, seller]);
+
+    const handleGoBack = () => {
+        router.dismissAll();
+    };
 
     if (!seller) {
         return <View style={styles.centered}><ActivityIndicator /></View>;
     }
 
     const ListHeader = () => (
-        <Animated.View entering={FadeIn.duration(600)}>
-            {/* Profil Başlığı */}
-            <View style={styles.profileHeader}>
-                <Image source={seller.logo} style={styles.profileLogo} />
-                <Text style={styles.profileName}>{seller.name}</Text>
-                <Text style={styles.profileMotto}>"{seller.motto}"</Text>
-                <View style={styles.statsContainer}>
-                    <View style={styles.statBox}>
-                        <Text style={styles.statValue}>{seller.rating.toFixed(1)}</Text>
-                        <Text style={styles.statLabel}>Puan</Text>
-                    </View>
-                    <View style={styles.statBox}>
-                        <Text style={styles.statValue}>{sellerProducts.length}</Text>
-                        <Text style={styles.statLabel}>Ürün</Text>
-                    </View>
-                    <View style={styles.statBox}>
-                        <Text style={styles.statValue}>{seller.since}</Text>
-                        <Text style={styles.statLabel}>Başlangıç</Text>
+        <>
+            <View style={{ height: 120 }} />
+            <Animated.View entering={FadeIn.duration(600)}>
+                <View style={styles.profileHeader}>
+                    <Image source={seller.logo} style={styles.profileLogo} />
+                    <Text style={styles.profileName}>{seller.name}</Text>
+                    <Text style={styles.profileMotto}>"{seller.motto}"</Text>
+                    <View style={styles.statsContainer}>
+                        <View style={styles.statBox}>
+                            <Text style={styles.statValue}>{seller.rating.toFixed(1)}</Text>
+                            <Text style={styles.statLabel}>Puan</Text>
+                        </View>
+                        <View style={styles.statBox}>
+                            <Text style={styles.statValue}>{sellerProducts.length}</Text>
+                            <Text style={styles.statLabel}>Ürün</Text>
+                        </View>
+                        <View style={styles.statBox}>
+                            <Text style={styles.statValue}>{seller.since}</Text>
+                            <Text style={styles.statLabel}>Başlangıç</Text>
+                        </View>
                     </View>
                 </View>
-            </View>
-            {/* Ürünler Başlığı */}
-            <Text style={styles.productsTitle}>Tüm Ürünleri</Text>
-        </Animated.View>
+                <Text style={styles.productsTitle}>Tüm Ürünleri</Text>
+            </Animated.View>
+        </>
     );
 
     return (
-        <SafeAreaView style={styles.container}>
-            {/* Kendi özel header'ımız */}
-            <View style={styles.header}>
-                <View style={{width: 44}} />
-                <Text style={styles.headerTitle}>{seller?.name}</Text>
-                <TouchableOpacity onPress={() => router.dismissAll()} style={styles.closeButton}>
-                    <Ionicons name="close" size={28} color={colors.text.primary} />
-                </TouchableOpacity>
-            </View>
+        <View style={styles.container}>
+            <Stack.Screen options={{ headerShown: false }} />
+            <Image source={seller.logo} style={styles.backgroundImage} />
+            <BlurView intensity={90} tint="light" style={StyleSheet.absoluteFill} />
+            <SafeAreaView style={styles.floatingHeaderContainer}>
+                <Animated.View entering={FadeIn.duration(800)}>
+                    <BlurView intensity={80} tint="light" style={styles.pillContainer}>
+                        <TouchableOpacity onPress={handleGoBack} style={styles.pillButton}>
+                            <Ionicons name="arrow-back-outline" size={22} color={colors.text.primary} />
+                        </TouchableOpacity>
+                        <View style={styles.pillDivider} />
+                        <TouchableOpacity onPress={() => { /* Paylaşma işlevi */ }} style={styles.pillButton}>
+                            <Ionicons name="share-outline" size={22} color={colors.text.primary} />
+                        </TouchableOpacity>
+                    </BlurView>
+                </Animated.View>
+            </SafeAreaView>
             <FlatList
-                style={styles.container}
                 data={sellerProductsWithSeller}
                 keyExtractor={(item) => item.id}
                 numColumns={2}
                 ListHeaderComponent={ListHeader}
                 columnWrapperStyle={styles.row}
+                showsVerticalScrollIndicator={false}
                 renderItem={({ item, index }) => (
                     <Animated.View 
                         style={styles.cardContainer}
@@ -84,7 +96,7 @@ export default function SellerProfilePage() {
                     </Animated.View>
                 )}
             />
-        </SafeAreaView>
+        </View>
     );
 }
 
@@ -98,11 +110,15 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    backgroundImage: { ...StyleSheet.absoluteFillObject, width: '100%', height: '100%', resizeMode: 'cover' },
+    floatingHeaderContainer: { position: 'absolute', top: 10, left: 0, right: 0, zIndex: 10, alignItems: 'center' },
+    pillContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: `${colors.surface.DEFAULT}80`, borderRadius: 99, ...shadows.subtle, overflow: 'hidden', borderWidth: 1, borderColor: `${colors.surface.DEFAULT}99` },
+    pillButton: { paddingVertical: spacing.md, paddingHorizontal: spacing.lg },
+    pillDivider: { width: 1, height: '40%', backgroundColor: `${colors.border}99` },
     profileHeader: {
         alignItems: 'center',
-        padding: spacing.xl,
-        backgroundColor: colors.surface.DEFAULT,
-        paddingBottom: spacing.lg,
+        paddingHorizontal: spacing.xl,
+        backgroundColor: 'transparent',
     },
     profileLogo: {
         width: 100,
@@ -110,26 +126,32 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         marginBottom: spacing.md,
         borderWidth: 3,
-        borderColor: colors.primary.light,
+        borderColor: colors.surface.DEFAULT,
+        ...shadows.medium,
     },
     profileName: {
         ...typography.h1,
         fontSize: 28,
+        color: colors.text.primary,
+        ...shadows.subtle,
     },
     profileMotto: {
         ...typography.body,
         color: colors.text.secondary,
         marginTop: spacing.xs,
         marginBottom: spacing.lg,
+        textAlign: 'center'
     },
     statsContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
         width: '100%',
         marginTop: spacing.md,
-        paddingVertical: spacing.md,
-        backgroundColor: colors.background.DEFAULT,
+        padding: spacing.md,
+        backgroundColor: `${colors.surface.DEFAULT}cc`,
         borderRadius: borderRadius.lg,
+        borderWidth: 1, 
+        borderColor: `${colors.border}80`, 
     },
     statBox: {
         alignItems: 'center',
@@ -157,22 +179,5 @@ const styles = StyleSheet.create({
     cardContainer: {
         width: '48.5%',
         marginBottom: spacing.lg,
-    },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: spacing.md,
-        paddingVertical: spacing.sm,
-        borderBottomWidth: 1,
-        borderBottomColor: colors.border
-    },
-    headerTitle: {
-        ...typography.h2,
-        fontSize: 18,
-        fontWeight: '600'
-    },
-    closeButton: {
-        padding: spacing.xs,
     },
 });

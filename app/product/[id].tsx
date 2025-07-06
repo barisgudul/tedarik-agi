@@ -1,3 +1,4 @@
+// app/prodcut/[id].tsx
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, useWindowDimensions, Image, TouchableOpacity, SafeAreaView } from 'react-native';
 import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
@@ -74,7 +75,7 @@ export default function ThePodiumPage() {
                     >
                         <Image source={seller.logo} style={styles.detailCardLogo} />
                         <View style={styles.detailCardTextContainer}>
-                            <Text style={styles.detailCardLabel}>Sanatçı</Text>
+                            <Text style={styles.detailCardLabel}>Satıcı</Text>
                             <Text style={styles.detailCardValue}>{seller.name}</Text>
                         </View>
                         <Ionicons name="arrow-forward" size={22} color={colors.text.secondary} />

@@ -1,24 +1,37 @@
 // components/OverlayMenu.tsx
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Pressable, Platform, SafeAreaView } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+// DİKKAT: İhtiyacımız olan TÜM kütüphaneleri import ediyoruz.
+import { Feather, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useFilterStore } from '../store/filterStore';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, interpolate, Extrapolate } from 'react-native-reanimated';
 import { BlurView } from 'expo-blur';
 
+// Kategori verimiz artık kütüphane bilgisini de içeriyor.
 const categories = [
-    { name: 'Pırlanta', icon: 'diamond-outline' },
-    { name: 'Açık Taşlar', icon: 'cube-outline' },
-    { name: 'Mücevher', icon: 'key-outline' },
-    { name: 'Renkli Taş', icon: 'color-palette-outline' },
-    { name: 'Ziynet', icon: 'server-outline' },
-    { name: 'Metaller', icon: 'grid-outline' },
-    { name: 'Alyans', icon: 'heart-circle-outline' },
-    { name: 'Bilezik', icon: 'watch-outline' },
-    { name: 'Hurda', icon: 'trash-bin-outline' },
-    { name: 'Saat', icon: 'time-outline' },
+    { name: 'Pırlanta', icon: 'diamond-stone', library: 'MaterialCommunityIcons' },
+    { name: 'Değerli Taşlar', icon: 'gem', library: 'FontAwesome5' },
+    { name: 'Mücevher', icon: 'necklace', library: 'MaterialCommunityIcons' },
+    { name: 'Alyans', icon: 'ring', library: 'MaterialCommunityIcons' },
+    { name: 'Saat', icon: 'watch', library: 'MaterialCommunityIcons' },
+    { name: 'Yatırım & Ziynet', icon: 'gold', library: 'MaterialCommunityIcons' },
 ];
+
+// Farklı kütüphanelerden ikonları dinamik olarak render etmek için bir yardımcı bileşen.
+const DynamicIcon = ({ library, name, size, color }: { library: string, name: string, size: number, color: string }) => {
+    switch (library) {
+        case 'MaterialCommunityIcons':
+            return <MaterialCommunityIcons name={name as any} size={size} color={color} />;
+        case 'FontAwesome5':
+            return <FontAwesome5 name={name as any} size={size} color={color} />;
+        case 'Feather':
+            return <Feather name={name as any} size={size} color={color} />;
+        default:
+            return <Feather name="alert-circle" size={size} color={color} />; // Fallback
+    }
+};
+
 
 interface OverlayMenuProps {
   isVisible: boolean;
@@ -26,24 +39,18 @@ interface OverlayMenuProps {
 }
 
 export default function OverlayMenu({ isVisible, onClose }: OverlayMenuProps) {
+  // ... (Geri kalan kodda değişiklik yok, olduğu gibi bırakabilirsiniz)
   const router = useRouter();
   const setSelectedCategory = useFilterStore((state) => state.setSelectedCategory);
-  
-  // 0: Kapalı, 1: Açık. Animasyonları yönetmek için daha esnek.
   const progress = useSharedValue(0);
 
   const backdropAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: progress.value,
-      pointerEvents: progress.value > 0 ? 'auto' : 'none',
-    };
+    return { opacity: progress.value, pointerEvents: progress.value > 0 ? 'auto' : 'none' };
   });
 
   const menuAnimatedStyle = useAnimatedStyle(() => {
     const translateX = interpolate(progress.value, [0, 1], [-320, 0], Extrapolate.CLAMP);
-    return {
-      transform: [{ translateX }],
-    };
+    return { transform: [{ translateX }] };
   });
 
   useEffect(() => {
@@ -52,41 +59,35 @@ export default function OverlayMenu({ isVisible, onClose }: OverlayMenuProps) {
 
   const handleCategoryPress = (categoryName: string) => {
     setSelectedCategory(categoryName);
-    onClose(); 
+    onClose();
   };
-  
+
   return (
     <Animated.View style={[styles.backdrop, backdropAnimatedStyle]}>
-      {/* Arka planı buğulu hale getiren BlurView */}
-      {Platform.OS === 'ios' && (
-        <BlurView 
-          style={StyleSheet.absoluteFill} 
-          tint="dark" 
-          intensity={25} 
-        />
-      )}
-
-      {/* Dışarıya tıklanınca kapatma işlevi */}
+      {Platform.OS === 'ios' && <BlurView style={StyleSheet.absoluteFill} tint="dark" intensity={25} />}
       <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
       
       <Animated.View style={[styles.menuContainer, menuAnimatedStyle]}>
         <SafeAreaView style={{ flex: 1 }}>
+          {/* İsteğiniz üzerine başlık yeniden konumlandırıldı */}
           <View style={styles.menuHeader}>
             <Text style={styles.headerTitle}>Fastkart.</Text>
           </View>
+
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <TouchableOpacity style={styles.menuItem} onPress={() => handleCategoryPress('all')}>
-                <Ionicons name="grid-outline" size={24} color="#EAEAEA" />
-                <Text style={styles.menuItemText}>Tüm Ürünler</Text>
+              <DynamicIcon library="Feather" name="grid" size={24} color="#EAEAEA" />
+              <Text style={styles.menuItemText}>Tüm Ürünler</Text>
             </TouchableOpacity>
             
             {categories.map((category) => (
               <TouchableOpacity key={category.name} style={styles.menuItem} onPress={() => handleCategoryPress(category.name)}>
-                <Ionicons name={category.icon as any} size={24} color="#EAEAEA" />
+                <DynamicIcon library={category.library} name={category.icon} size={24} color="#EAEAEA" />
                 <Text style={styles.menuItemText}>{category.name}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
+
           <View style={styles.menuFooter}>
             <Text style={styles.footerText}>© 2025 OrbitX</Text>
           </View>
@@ -97,6 +98,16 @@ export default function OverlayMenu({ isVisible, onClose }: OverlayMenuProps) {
 }
 
 const styles = StyleSheet.create({
+  // ...
+  menuHeader: { 
+    paddingHorizontal: 25, 
+    // DEĞİŞİKLİK: Başlığı biraz daha aşağı almak için paddingTop artırıldı.
+    paddingTop: 45, 
+    paddingBottom: 25, 
+    borderBottomWidth: 1, 
+    borderBottomColor: 'rgba(255, 255, 255, 0.1)' 
+  },
+  // Geri kalan stiller aynı...
   backdrop: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 1000,
@@ -114,12 +125,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 20,
     elevation: 30,
-  },
-  menuHeader: { 
-    paddingHorizontal: 25, 
-    paddingVertical: 30, 
-    borderBottomWidth: 1, 
-    borderBottomColor: 'rgba(255, 255, 255, 0.1)' 
   },
   headerTitle: { 
     fontSize: 28, 
