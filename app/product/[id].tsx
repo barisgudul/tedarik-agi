@@ -1,4 +1,4 @@
-// app/prodcut/[id].tsx
+// product/[id].tsx
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, useWindowDimensions, Image, TouchableOpacity, SafeAreaView } from 'react-native';
 import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
@@ -14,20 +14,25 @@ import { useFilterStore } from '../../store/filterStore';
 export default function ThePodiumPage() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
-    const setSelectedCategory = useFilterStore((state) => state.setSelectedCategory);
+
+    // --- DÜZELTME 1: Store'dan doğru fonksiyonu alıyoruz ---
+    // Artık 'setSelectedCategory' yok, onun yerine 'showProducts' var.
+    const showProducts = useFilterStore((state) => state.showProducts);
 
     const product = useMemo(() => products.find((p) => p.id === id), [id]);
     const seller = useMemo(() => sellers.find(s => s.id === product?.sellerId), [product]);
 
     // KATEGORİYE DÖNÜŞ FONKSİYONU
     const handleCategoryPress = (category: string) => {
-        setSelectedCategory(category);
-        router.dismissAll();
+        // --- DÜZELTME 2: Eski fonksiyonu yeni fonksiyon ile değiştiriyoruz ---
+        showProducts(category);
+        router.dismissAll(); // Bu, tüm modal pencereleri kapatıp ana sekmeye döner.
     };
 
     // GERİ BUTONU FONKSİYONU
     const handleGoHome = () => {
-        setSelectedCategory('all');
+        // --- DÜZELTME 3: Eski fonksiyonu yeni fonksiyon ile değiştiriyoruz ---
+        showProducts('all'); // Anasayfaya dönerken tüm ürünleri göster
         router.dismissAll();
     };
 
@@ -43,6 +48,7 @@ export default function ThePodiumPage() {
             <SafeAreaView style={styles.floatingHeaderContainer}>
                 <Animated.View entering={FadeIn.duration(800)}>
                     <BlurView intensity={80} tint="light" style={styles.pillContainer}>
+                        {/* Geri butonu artık handleGoHome fonksiyonunu kullanıyor */}
                         <TouchableOpacity onPress={handleGoHome} style={styles.pillButton}>
                             <Ionicons name="arrow-back-outline" size={22} color={colors.text.primary} />
                         </TouchableOpacity>
@@ -70,7 +76,8 @@ export default function ThePodiumPage() {
                     {/* Satıcı Kartı */}
                     <TouchableOpacity 
                         style={[styles.detailCard, { marginBottom: spacing.lg }]} 
-                        onPress={() => router.push(`/seller/${seller.id}`)}
+                        // --- DEĞİŞİKLİK BURADA ---
+                        onPress={() => router.replace(`/seller/${seller.id}`)}
                         activeOpacity={0.8}
                     >
                         <Image source={seller.logo} style={styles.detailCardLogo} />
@@ -125,6 +132,7 @@ export default function ThePodiumPage() {
     );
 }
 
+// Stillerde değişiklik yapmaya gerek yok, aynı kalabilirler.
 const styles = StyleSheet.create({
     container: { flex: 1 },
     centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
@@ -140,7 +148,7 @@ const styles = StyleSheet.create({
     productPrice: { ...typography.h2, color: colors.text.secondary, fontSize: 22, marginTop: spacing.sm, fontWeight: '400', },
     detailsContainer: { 
         paddingHorizontal: spacing.lg,
-        paddingBottom: spacing.lg, // Altına da biraz boşluk ekledik
+        paddingBottom: spacing.lg,
     },
     detailCard: { 
         flexDirection: 'row', 
@@ -158,12 +166,12 @@ const styles = StyleSheet.create({
     infoRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginHorizontal: -spacing.xs, // Kartlar arası boşluk için
+        marginHorizontal: -spacing.xs,
     },
     halfCard: {
-        width: '49%', // Kartların yan yana sığması için
+        width: '49%',
         marginHorizontal: spacing.xs,
-        paddingVertical: spacing.lg, // Dikey olarak daha ferah
+        paddingVertical: spacing.lg,
         flexDirection: 'column',
         alignItems: 'flex-start'
     },

@@ -10,62 +10,66 @@ import { sellers, products as allProducts } from '../../data/sampleProducts';
 import { ProductWithSellerId } from '../../types';
 import { colors, spacing, typography, borderRadius, shadows } from '../../constants/styles';
 import ProductCard from '../../components/ProductCard';
+import { StarRating } from '../../components/StarRating'; // --- ADIM 1: StarRating'i import et ---
 
 export default function SellerProfilePage() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
 
     const seller = useMemo(() => sellers.find(s => s.id === id), [id]);
-    const sellerProducts = useMemo(() => (allProducts as ProductWithSellerId[]).filter(p => p.sellerId === id), [id]);
-
-    const sellerProductsWithSeller = useMemo(() => {
+    const sellerProducts = useMemo(() => {
         if (!seller) return [];
-        return sellerProducts.map(p => ({ ...p, seller }));
-    }, [sellerProducts, seller]);
+        const products = (allProducts as ProductWithSellerId[]).filter(p => p.sellerId === id);
+        return products.map(p => ({ ...p, seller }));
+    }, [id, seller]);
 
     const handleGoBack = () => {
-        router.dismissAll();
+        if (router.canGoBack()) router.back();
+        else router.replace('/(tabs)');
     };
-
+    
     if (!seller) {
-        return <View style={styles.centered}><ActivityIndicator /></View>;
+        return <View style={styles.container}><ActivityIndicator color={colors.primary.DEFAULT} /></View>;
     }
-
+    
     const ListHeader = () => (
         <>
             <View style={{ height: 120 }} />
-            <Animated.View entering={FadeIn.duration(600)}>
-                <View style={styles.profileHeader}>
-                    <Image source={seller.logo} style={styles.profileLogo} />
-                    <Text style={styles.profileName}>{seller.name}</Text>
-                    <Text style={styles.profileMotto}>"{seller.motto}"</Text>
-                    <View style={styles.statsContainer}>
-                        <View style={styles.statBox}>
-                            <Text style={styles.statValue}>{seller.rating.toFixed(1)}</Text>
-                            <Text style={styles.statLabel}>Puan</Text>
-                        </View>
-                        <View style={styles.statBox}>
-                            <Text style={styles.statValue}>{sellerProducts.length}</Text>
-                            <Text style={styles.statLabel}>Ürün</Text>
-                        </View>
-                        <View style={styles.statBox}>
-                            <Text style={styles.statValue}>{seller.since}</Text>
-                            <Text style={styles.statLabel}>Başlangıç</Text>
-                        </View>
+            <View style={styles.profileHeader}>
+                <Image source={seller.logo} style={styles.profileLogo} />
+                <Text style={styles.profileName}>{seller.name}</Text>
+                <Text style={styles.profileMotto}>"{seller.motto}"</Text>
+                <View style={styles.statsContainer}>
+                    {/* --- ADIM 2: Puan Kutusunu Güncelle --- */}
+                    <View style={styles.statBox}>
+                        {/* Sayısal puan yerine StarRating bileşenini kullan */}
+                        <StarRating rating={seller.rating} size={20} />
+                        <Text style={styles.statLabel}>Puan ({seller.rating.toFixed(1)})</Text>
+                    </View>
+                    {/* Diğer kutular aynı kalıyor */}
+                    <View style={styles.statBox}>
+                        <Text style={styles.statValue}>{sellerProducts.length}</Text>
+                        <Text style={styles.statLabel}>Ürün</Text>
+                    </View>
+                    <View style={styles.statBox}>
+                        <Text style={styles.statValue}>{seller.since}</Text>
+                        <Text style={styles.statLabel}>Başlangıç</Text>
                     </View>
                 </View>
-                <Text style={styles.productsTitle}>Tüm Ürünleri</Text>
-            </Animated.View>
+            </View>
+            <Text style={styles.productsTitle}>Tüm Ürünleri</Text>
         </>
     );
 
     return (
         <View style={styles.container}>
             <Stack.Screen options={{ headerShown: false }} />
-            <Image source={seller.logo} style={styles.backgroundImage} />
+            
+            <Image source={seller.coverImage} style={styles.backgroundImage} />
             <BlurView intensity={90} tint="light" style={StyleSheet.absoluteFill} />
-            <SafeAreaView style={styles.floatingHeaderContainer}>
-                <Animated.View entering={FadeIn.duration(800)}>
+            
+            <Animated.View style={{flex: 1}} entering={FadeIn.duration(400)}>
+                <SafeAreaView style={styles.floatingHeaderContainer}>
                     <BlurView intensity={80} tint="light" style={styles.pillContainer}>
                         <TouchableOpacity onPress={handleGoBack} style={styles.pillButton}>
                             <Ionicons name="arrow-back-outline" size={22} color={colors.text.primary} />
@@ -75,27 +79,28 @@ export default function SellerProfilePage() {
                             <Ionicons name="share-outline" size={22} color={colors.text.primary} />
                         </TouchableOpacity>
                     </BlurView>
-                </Animated.View>
-            </SafeAreaView>
-            <FlatList
-                data={sellerProductsWithSeller}
-                keyExtractor={(item) => item.id}
-                numColumns={2}
-                ListHeaderComponent={ListHeader}
-                columnWrapperStyle={styles.row}
-                showsVerticalScrollIndicator={false}
-                renderItem={({ item, index }) => (
-                    <Animated.View 
-                        style={styles.cardContainer}
-                        entering={FadeInUp.delay(100 * (index % 2))}
-                    >
-                        <ProductCard 
-                            product={item} 
-                            onPress={() => router.push(`/product/${item.id}`)}
-                        />
-                    </Animated.View>
-                )}
-            />
+                </SafeAreaView>
+                
+                <FlatList
+                    data={sellerProducts}
+                    keyExtractor={(item) => item.id}
+                    numColumns={2}
+                    ListHeaderComponent={ListHeader}
+                    columnWrapperStyle={styles.row}
+                    showsVerticalScrollIndicator={false}
+                    renderItem={({ item, index }) => (
+                        <Animated.View 
+                            style={styles.cardContainer}
+                            entering={FadeInUp.delay(100 * (index % 2))}
+                        >
+                            <ProductCard 
+                                product={item} 
+                                onPress={() => router.push(`/product/${item.id}`)}
+                            />
+                        </Animated.View>
+                    )}
+                />
+            </Animated.View>
         </View>
     );
 }
@@ -105,12 +110,24 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: colors.background.DEFAULT,
     },
+    // --- ADIM 3: statBox stilini ayarla (daha iyi hizalama için) ---
+    statBox: {
+        alignItems: 'center',
+        flex: 1, // Kutuların eşit genişlikte olmasını sağla
+        paddingVertical: spacing.sm,
+    },
+    // Diğer tüm stiller aynı
     centered: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
     },
-    backgroundImage: { ...StyleSheet.absoluteFillObject, width: '100%', height: '100%', resizeMode: 'cover' },
+    backgroundImage: { 
+        ...StyleSheet.absoluteFillObject, 
+        width: '100%', 
+        height: '100%', 
+        resizeMode: 'cover'
+    },
     floatingHeaderContainer: { position: 'absolute', top: 10, left: 0, right: 0, zIndex: 10, alignItems: 'center' },
     pillContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: `${colors.surface.DEFAULT}80`, borderRadius: 99, ...shadows.subtle, overflow: 'hidden', borderWidth: 1, borderColor: `${colors.surface.DEFAULT}99` },
     pillButton: { paddingVertical: spacing.md, paddingHorizontal: spacing.lg },
@@ -145,6 +162,7 @@ const styles = StyleSheet.create({
     statsContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
+        alignItems: 'center', // dikeyde ortala
         width: '100%',
         marginTop: spacing.md,
         padding: spacing.md,
@@ -153,18 +171,17 @@ const styles = StyleSheet.create({
         borderWidth: 1, 
         borderColor: `${colors.border}80`, 
     },
-    statBox: {
-        alignItems: 'center',
-    },
     statValue: {
         ...typography.h2,
         fontSize: 20,
+        height: 24, // Yıldızlarla aynı hizada durması için sabit yükseklik ver
+        textAlignVertical: 'center',
     },
     statLabel: {
         ...typography.body,
         fontSize: 12,
         color: colors.text.tertiary,
-        marginTop: spacing.xs,
+        marginTop: 8, // Yıldızlardan sonra biraz boşluk
     },
     productsTitle: {
         ...typography.h2,

@@ -1,14 +1,11 @@
-// components/OverlayMenu.tsx
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Pressable, Platform, SafeAreaView } from 'react-native';
-// DİKKAT: İhtiyacımız olan TÜM kütüphaneleri import ediyoruz.
 import { Feather, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
 import { useFilterStore } from '../store/filterStore';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, interpolate, Extrapolate } from 'react-native-reanimated';
 import { BlurView } from 'expo-blur';
 
-// Kategori verimiz artık kütüphane bilgisini de içeriyor.
+// Kategori verimiz, kütüphane bilgisini de içeriyor.
 const categories = [
     { name: 'Pırlanta', icon: 'diamond-stone', library: 'MaterialCommunityIcons' },
     { name: 'Değerli Taşlar', icon: 'gem', library: 'FontAwesome5' },
@@ -18,7 +15,8 @@ const categories = [
     { name: 'Yatırım & Ziynet', icon: 'gold', library: 'MaterialCommunityIcons' },
 ];
 
-// Farklı kütüphanelerden ikonları dinamik olarak render etmek için bir yardımcı bileşen.
+// Farklı kütüphanelerden ikonları dinamik olarak render etmek için yardımcı bileşen.
+// Bu yapıya dokunmuyoruz, gayet güzel çalışıyor.
 const DynamicIcon = ({ library, name, size, color }: { library: string, name: string, size: number, color: string }) => {
     switch (library) {
         case 'MaterialCommunityIcons':
@@ -32,16 +30,19 @@ const DynamicIcon = ({ library, name, size, color }: { library: string, name: st
     }
 };
 
-
 interface OverlayMenuProps {
   isVisible: boolean;
   onClose: () => void;
 }
 
 export default function OverlayMenu({ isVisible, onClose }: OverlayMenuProps) {
-  // ... (Geri kalan kodda değişiklik yok, olduğu gibi bırakabilirsiniz)
-  const router = useRouter();
-  const setSelectedCategory = useFilterStore((state) => state.setSelectedCategory);
+  // DİKKAT: store'dan yeni fonksiyonları alıyoruz
+  const { showProducts, showSellers } = useFilterStore();
+  
+  // Bu kodlara artık ihtiyacımız yok
+  // const router = useRouter(); 
+  // const setSelectedCategory = useFilterStore((state) => state.setSelectedCategory);
+
   const progress = useSharedValue(0);
 
   const backdropAnimatedStyle = useAnimatedStyle(() => {
@@ -57,8 +58,15 @@ export default function OverlayMenu({ isVisible, onClose }: OverlayMenuProps) {
     progress.value = withTiming(isVisible ? 1 : 0, { duration: 350 });
   }, [isVisible]);
 
+  // Kategori seçildiğinde çalışacak fonksiyon
   const handleCategoryPress = (categoryName: string) => {
-    setSelectedCategory(categoryName);
+    showProducts(categoryName); // Yeni store fonksiyonunu kullan
+    onClose();
+  };
+
+  // Satıcılar linkine basıldığında çalışacak fonksiyon
+  const handleSellersPress = () => {
+    showSellers(); // Yeni store fonksiyonunu kullan
     onClose();
   };
 
@@ -69,23 +77,32 @@ export default function OverlayMenu({ isVisible, onClose }: OverlayMenuProps) {
       
       <Animated.View style={[styles.menuContainer, menuAnimatedStyle]}>
         <SafeAreaView style={{ flex: 1 }}>
-          {/* İsteğiniz üzerine başlık yeniden konumlandırıldı */}
           <View style={styles.menuHeader}>
             <Text style={styles.headerTitle}>Fastkart.</Text>
           </View>
 
           <ScrollView contentContainerStyle={styles.scrollContent}>
+            {/* "Tüm Ürünler" linki artık showProducts('all') çağıracak */}
             <TouchableOpacity style={styles.menuItem} onPress={() => handleCategoryPress('all')}>
               <DynamicIcon library="Feather" name="grid" size={24} color="#EAEAEA" />
               <Text style={styles.menuItemText}>Tüm Ürünler</Text>
             </TouchableOpacity>
             
+            {/* Kategori Listesi */}
             {categories.map((category) => (
               <TouchableOpacity key={category.name} style={styles.menuItem} onPress={() => handleCategoryPress(category.name)}>
                 <DynamicIcon library={category.library} name={category.icon} size={24} color="#EAEAEA" />
                 <Text style={styles.menuItemText}>{category.name}</Text>
               </TouchableOpacity>
             ))}
+
+            <View style={styles.divider} />
+
+            {/* Satıcı Profilleri linki artık showSellers() çağıracak */}
+            <TouchableOpacity style={styles.menuItem} onPress={handleSellersPress}>
+              <DynamicIcon library="MaterialCommunityIcons" name="storefront-outline" size={24} color="#EAEAEA" />
+              <Text style={styles.menuItemText}>Satıcı Profilleri</Text>
+            </TouchableOpacity>
           </ScrollView>
 
           <View style={styles.menuFooter}>
@@ -98,16 +115,6 @@ export default function OverlayMenu({ isVisible, onClose }: OverlayMenuProps) {
 }
 
 const styles = StyleSheet.create({
-  // ...
-  menuHeader: { 
-    paddingHorizontal: 25, 
-    // DEĞİŞİKLİK: Başlığı biraz daha aşağı almak için paddingTop artırıldı.
-    paddingTop: 45, 
-    paddingBottom: 25, 
-    borderBottomWidth: 1, 
-    borderBottomColor: 'rgba(255, 255, 255, 0.1)' 
-  },
-  // Geri kalan stiller aynı...
   backdrop: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 1000,
@@ -125,6 +132,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 20,
     elevation: 30,
+  },
+  menuHeader: { 
+    paddingHorizontal: 25, 
+    paddingTop: 45, 
+    paddingBottom: 25, 
+    borderBottomWidth: 1, 
+    borderBottomColor: 'rgba(255, 255, 255, 0.1)' 
   },
   headerTitle: { 
     fontSize: 28, 
@@ -150,6 +164,14 @@ const styles = StyleSheet.create({
     fontWeight: '500', 
     color: '#F2F2F7',
   },
+  // --- YENİ EKLENEN STİL ---
+  divider: {
+    height: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    marginVertical: 15,
+    marginHorizontal: 25,
+  },
+  // ---
   menuFooter: {
     padding: 25,
     borderTopWidth: 1,

@@ -7,6 +7,7 @@ export interface Seller {
   rating: number;
   reviews: number;
   motto: string;
+  coverImage?: any; // Kapak fotoğrafı (opsiyonel)
 }
 
 // Ürün tipi (güncellendi)

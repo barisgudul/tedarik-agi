@@ -1,4 +1,3 @@
-// app/_layout.tsx
 import { Stack } from 'expo-router';
 import 'react-native-reanimated';
 
@@ -20,6 +19,7 @@ export default function RootLayout() {
           presentation: 'modal',
         }}
       />
+      {/* sellers için olan Stack.Screen tanımı buradan kaldırıldı */}
     </Stack>
   );
 }

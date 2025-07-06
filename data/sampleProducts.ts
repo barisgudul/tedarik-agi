@@ -1,12 +1,38 @@
 // data/sampleProducts.ts
 import { Product, Seller } from '../types';
 
-// --- SATICILAR ---
-// Bu kısımda bir değişiklik yok, olduğu gibi kalabilir.
+// --- SATICILAR (Kapak Fotoğrafı Eklenmiş Hali) ---
 export const sellers: Seller[] = [
-  { id: 'alya-kuyumculuk', name: "Alya Kuyumculuk", logo: require('../assets/images/sellers/seller1.png'), since: 2018, rating: 4.9, reviews: 124, motto: "Zarafetin Işıltılı Dokunuşu" },
-  { id: 'elmas-isiltisi', name: "Elmas Işıltısı", logo: require('../assets/images/sellers/seller2.png'), since: 2020, rating: 4.8, reviews: 88, motto: "Doğadan Gelen Sanat" },
-  { id: 'altin-atolyesi', name: "Altın Atölyesi", logo: require('../assets/images/sellers/seller3.png'), since: 2015, rating: 5.0, reviews: 250, motto: "Nesiller Boyu Süren Değer" },
+  { 
+    id: 'alya-kuyumculuk', 
+    name: "Alya Kuyumculuk", 
+    logo: require('../assets/images/sellers/seller1.png'), 
+    since: 2018, 
+    rating: 4.9, 
+    reviews: 124, 
+    motto: "Zarafetin Işıltılı Dokunuşu",
+    coverImage: require('../assets/images/products/product1.png') // Kapak fotoğrafı
+  },
+  { 
+    id: 'elmas-isiltisi', 
+    name: "Elmas Işıltısı", 
+    logo: require('../assets/images/sellers/seller2.png'), 
+    since: 2020, 
+    rating: 4.8, 
+    reviews: 88, 
+    motto: "Doğadan Gelen Sanat",
+    coverImage: require('../assets/images/products/product2.png') // Kapak fotoğrafı
+  },
+  { 
+    id: 'altin-atolyesi', 
+    name: "Altın Atölyesi", 
+    logo: require('../assets/images/sellers/seller3.png'), 
+    since: 2015, 
+    rating: 5.0, 
+    reviews: 250, 
+    motto: "Nesiller Boyu Süren Değer",
+    coverImage: require('../assets/images/products/product3.png') // Kapak fotoğrafı
+  },
 ];
 
 

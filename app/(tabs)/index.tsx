@@ -1,53 +1,91 @@
-// app/(tabs)/index.tsx - KESİN 1 BÜYÜK, 2 KÜÇÜK DÜZENİ
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ImageBackground } from 'react-native';
+import { useRouter } from 'expo-router';
+import Animated, { FadeInUp } from 'react-native-reanimated';
+
+// Bileşenleri ve verileri import et
 import BannerCarousel from '../../components/BannerCarousel';
 import ProductCard from '../../components/ProductCard';
-import { products as allProducts } from '../../data/sampleProducts';
-import { Product } from '../../types';
-import { useRouter } from 'expo-router';
+import { StarRating } from '../../components/StarRating'; // StarRating bileşenini import et
+import { products as allProducts, sellers as allSellers } from '../../data/sampleProducts';
+import { Product, Seller } from '../../types';
 import { useFilterStore } from '../../store/filterStore';
-import { spacing, colors, typography } from '../../constants/styles';
+import { spacing, colors, typography, borderRadius, shadows } from '../../constants/styles';
+import { LinearGradient } from 'expo-linear-gradient';
 
-// Veri tipi: Ya tek bir ürün (büyük satır) ya da iki ürün (küçük satır)
+// --- YENİ BİLGİLENDİRİCİ VE ŞIK SATICI KARTI ---
+const StylishSellerCard = ({ seller, onPress, index }: { seller: Seller; onPress: () => void; index: number; }) => {
+  return (
+    <Animated.View entering={FadeInUp.delay(100 * index).duration(600)}>
+      <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
+        <ImageBackground
+          source={seller.coverImage}
+          style={sellerStyles.card}
+          imageStyle={sellerStyles.cardImage}
+        >
+          <LinearGradient
+            colors={['transparent', 'rgba(0,0,0,0.2)', 'rgba(0,0,0,0.9)']} // Gradyanı daha belirgin yaptık
+            style={sellerStyles.gradient}
+          />
+          <View style={sellerStyles.cardContent}>
+            <Image source={seller.logo} style={sellerStyles.logo} />
+            <View style={sellerStyles.textContainer}>
+              <Text style={sellerStyles.sellerName}>{seller.name}</Text>
+              {/* Puan ve Yorum Bilgisi */}
+              <View style={sellerStyles.statsContainer}>
+                <StarRating rating={seller.rating} size={16} />
+                <Text style={sellerStyles.statsText}>{seller.rating.toFixed(1)}</Text>
+                <Text style={sellerStyles.statsTextMuted}>({seller.reviews} yorum)</Text>
+              </View>
+            </View>
+          </View>
+        </ImageBackground>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+};
+
+// Veri tipi
 type ProductRow = Product[];
 
 export default function Home() {
   const router = useRouter();
+  const viewMode = useFilterStore((state) => state.viewMode);
   const selectedCategory = useFilterStore((state) => state.selectedCategory);
 
-  // Filtrelenmiş ürünleri al
+  // --- OPTİMUM SATICI SIRALAMASI ---
+  const sortedSellers = useMemo(() => {
+    const BASE_RATING = 4.0; // Minimum kabul edilebilir puan
+    return [...allSellers].sort((a, b) => {
+      const scoreA = (a.rating - BASE_RATING) * Math.log(a.reviews + 1);
+      const scoreB = (b.rating - BASE_RATING) * Math.log(b.reviews + 1);
+      return scoreB - scoreA; // Yüksek skorlu olan önce gelsin
+    });
+  }, []); // Sadece bir kere hesaplanacak
+
+  // Ürünleri filtrele
   const filteredProducts = useMemo(() => {
     if (selectedCategory === 'all') return allProducts;
     return allProducts.filter((p) => p.category === selectedCategory);
   }, [selectedCategory]);
 
-  // Ürünleri [ [büyük_1], [küçük_1, küçük_2], [büyük_2], [küçük_3, küçük_4], ... ] formatına dönüştür
+  // Ürünleri 1-2-1-2 düzenine sok
   const productRows = useMemo(() => {
     const rows: ProductRow[] = [];
     let i = 0;
     while (i < filteredProducts.length) {
-      // Büyük satır (tek eleman)
+      if (filteredProducts[i]) { rows.push([filteredProducts[i]]); i++; }
       if (filteredProducts[i]) {
-        rows.push([filteredProducts[i]]);
-        i++;
-      }
-      // Küçük satır (iki eleman)
-      if (filteredProducts[i]) {
-        const smallRow: Product[] = [filteredProducts[i]];
-        i++;
-        if (filteredProducts[i]) {
-          smallRow.push(filteredProducts[i]);
-          i++;
-        }
+        const smallRow: Product[] = [filteredProducts[i]]; i++;
+        if (filteredProducts[i]) { smallRow.push(filteredProducts[i]); i++; }
         rows.push(smallRow);
       }
     }
     return rows;
   }, [filteredProducts]);
 
-  const renderRow = ({ item }: { item: ProductRow }) => {
-    // Eğer satırda tek bir ürün varsa, bu bizim "büyük" satırımızdır.
+  // --- RENDER FONKSİYONLARI ---
+  const renderProductRow = ({ item }: { item: ProductRow }) => {
     if (item.length === 1) {
       const product = item[0];
       return (
@@ -56,8 +94,6 @@ export default function Home() {
         </View>
       );
     }
-
-    // Eğer satırda iki ürün varsa, bu bizim "küçük" satırımızdır.
     if (item.length > 1) {
       return (
         <View style={[styles.rowWrapper, styles.smallRowContainer]}>
@@ -65,7 +101,6 @@ export default function Home() {
             <ProductCard product={item[0]} variant="default" onPress={() => router.push(`/product/${item[0].id}`)} />
           </View>
           <View style={styles.smallCardWrapper}>
-            {/* Eğer tek ürün kaldıysa boşluk render etme */}
             {item[1] && <ProductCard product={item[1]} variant="default" onPress={() => router.push(`/product/${item[1].id}`)} />}
           </View>
         </View>
@@ -74,9 +109,41 @@ export default function Home() {
     return null;
   };
 
+  const renderSellerRow = ({ item, index }: { item: Seller, index: number }) => {
+    return (
+      <View style={styles.rowWrapper}>
+        <StylishSellerCard seller={item} index={index} onPress={() => router.push(`/seller/${item.id}`)} />
+      </View>
+    );
+  };
+
+  // --- ANA RENDER ---
+  if (viewMode === 'sellers') {
+    return (
+      <FlatList
+        style={styles.container}
+        data={sortedSellers} // SIRALANMIŞ VERİYİ KULLANIYORUZ
+        renderItem={renderSellerRow}
+        keyExtractor={(item) => item.id}
+        ListHeaderComponent={() => (
+          <View style={styles.collectionHeader}>
+            {/* BAŞLIK DEĞİŞTİRİLDİ */}
+            <Text style={styles.collectionTitle}>Öne Çıkan Satıcılar</Text>
+            <Text style={styles.collectionSubtitle}>Kullanıcılarımızın favorilerini keşfedin.</Text>
+          </View>
+        )}
+        ListEmptyComponent={<Text style={styles.emptyText}>Satıcı bulunamadı.</Text>}
+      />
+    );
+  }
+
+  // Varsayılan olarak ürünleri göster
   return (
     <FlatList
       style={styles.container}
+      data={productRows}
+      renderItem={renderProductRow}
+      keyExtractor={(item, index) => `row-${index}-${item[0].id}`}
       ListHeaderComponent={() => (
         <>
           <BannerCarousel />
@@ -86,41 +153,83 @@ export default function Home() {
           </View>
         </>
       )}
-      data={productRows}
-      renderItem={renderRow}
-      keyExtractor={(item, index) => `row-${index}-${item[0].id}`}
       ListEmptyComponent={<Text style={styles.emptyText}>Bu kategoride ürün bulunamadı.</Text>}
     />
   );
 }
 
+// ANA STİLLER (Değişiklik yok)
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.DEFAULT,
+  container: { flex: 1, backgroundColor: colors.background.DEFAULT, },
+  collectionHeader: { paddingHorizontal: spacing.lg, paddingTop: spacing.xl, paddingBottom: spacing.md, },
+  collectionTitle: { ...typography.h2, color: colors.text.primary, },
+  collectionSubtitle: { ...typography.body, color: colors.text.secondary, },
+  rowWrapper: { paddingHorizontal: spacing.lg, marginBottom: spacing.lg, },
+  smallRowContainer: { flexDirection: 'row', justifyContent: 'space-between', },
+  smallCardWrapper: { width: '48.5%', },
+  emptyText: { ...typography.body, textAlign: 'center', marginTop: spacing.xxl, color: colors.text.secondary, },
+});
+
+// GÜNCELLENMİŞ SATICI KARTI STİLLERİ
+const sellerStyles = StyleSheet.create({
+  card: {
+    height: 220,
+    borderRadius: borderRadius.xl,
+    justifyContent: 'flex-end',
+    ...shadows.medium,
+    backgroundColor: colors.border,
   },
-  collectionHeader: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xl,
-    paddingBottom: spacing.md,
+  cardImage: {
+    borderRadius: borderRadius.xl,
   },
-  collectionTitle: { ...typography.h2, color: colors.text.primary },
-  collectionSubtitle: { ...typography.body, color: colors.text.secondary },
-  rowWrapper: {
-    paddingHorizontal: spacing.lg,
-    marginBottom: spacing.lg,
+  gradient: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: borderRadius.xl,
   },
-  smallRowContainer: {
+  cardContent: {
+    padding: spacing.md,
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    alignItems: 'flex-end', // İçeriği hem alta hem sola yasla
   },
-  smallCardWrapper: {
-    width: '48.5%', // Arada %3'lük bir boşluk bırakır
+  logo: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.9)',
+    marginRight: spacing.md,
   },
-  emptyText: {
-    ...typography.body,
-    textAlign: 'center',
-    marginTop: spacing.xxl,
-    color: colors.text.secondary,
+  textContainer: {
+    flex: 1,
+    paddingBottom: spacing.xs, // Logo ile hiza için hafif boşluk
   },
+  sellerName: {
+    ...typography.h2,
+    fontSize: 22,
+    color: colors.text.onDark,
+    fontWeight: 'bold',
+    textShadowColor: 'rgba(0, 0, 0, 0.5)', // Metne okunabilirlik için gölge
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+    marginBottom: spacing.xs,
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: spacing.xs,
+  },
+  statsText: {
+    fontSize: 14,
+    color: colors.text.onDark,
+    fontWeight: '600',
+    marginLeft: spacing.xs,
+  },
+  statsTextMuted: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.7)',
+    fontWeight: '500',
+    marginLeft: spacing.sm,
+  },
+  // Bu stil artık kullanılmıyor, silebilirsiniz veya bırakabilirsiniz.
+  sellerMotto: {}
 });
